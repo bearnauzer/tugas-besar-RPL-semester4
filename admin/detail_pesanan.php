@@ -4,41 +4,30 @@ require_once '../config/koneksi.php';
 
 $id_pesanan = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// HANYA UPDATE STATUS ORDER (Lunas/Pending/Batal) UNTUK ADMIN
 if (isset($_POST['update_status_pesanan'])) {
     $status_baru = mysqli_real_escape_string($conn, $_POST['status_pesanan']);
-    
-    // 1. Cek status lama pesanan sebelum diubah
     $cekStatus = mysqli_query($conn, "SELECT status FROM pesanan WHERE id = $id_pesanan");
     $data_lama = mysqli_fetch_assoc($cekStatus);
     $status_lama = $data_lama ? $data_lama['status'] : '';
-
-    // 2. Update status baru ke tabel pesanan
     mysqli_query($conn, "UPDATE pesanan SET status = '$status_baru' WHERE id = $id_pesanan");
 
-    // 3. LOGIKA POTONG STOK
-    // Jika status berubah dari bukan 'lunas' MENJADI 'lunas'
     if ($status_baru == 'lunas' && $status_lama != 'lunas') {
         $queryStok = mysqli_query($conn, "SELECT produk_id, jumlah FROM detail_pesanan WHERE pesanan_id = $id_pesanan AND produk_id IS NOT NULL");
         if ($queryStok && mysqli_num_rows($queryStok) > 0) {
             while ($item = mysqli_fetch_assoc($queryStok)) {
                 $id_produk = $item['produk_id'];
                 $jumlah_beli = $item['jumlah'];
-                // Kurangi stok di tabel produk_collection
                 mysqli_query($conn, "UPDATE produk_collection SET stok = stok - $jumlah_beli WHERE id = '$id_produk'");
             }
         }
     }
 
-    // 4. LOGIKA KEMBALIKAN STOK (Opsional tapi penting)
-    // Jika pesanan terlanjur 'lunas' lalu diubah menjadi 'dibatalkan/batal'
     if (($status_baru == 'dibatalkan' || $status_baru == 'batal') && $status_lama == 'lunas') {
         $queryStok = mysqli_query($conn, "SELECT produk_id, jumlah FROM detail_pesanan WHERE pesanan_id = $id_pesanan AND produk_id IS NOT NULL");
         if ($queryStok && mysqli_num_rows($queryStok) > 0) {
             while ($item = mysqli_fetch_assoc($queryStok)) {
                 $id_produk = $item['produk_id'];
                 $jumlah_beli = $item['jumlah'];
-                // Kembalikan stok yang sempat terpotong
                 mysqli_query($conn, "UPDATE produk_collection SET stok = stok + $jumlah_beli WHERE id = '$id_produk'");
             }
         }
@@ -80,11 +69,8 @@ if($pesanan['status'] == 'dibatalkan' || $pesanan['status'] == 'batal') $badge_c
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- GLOBAL MODERN UI --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: #F4F7FE; color: #2B3674; display: flex; font-size: 14px; }
-        
-        /* --- SIDEBAR --- */
         .sidebar { width: 260px; background: #ffffff; height: 100vh; position: fixed; left: 0; top: 0; box-shadow: 4px 0 20px rgba(0,0,0,0.03); display: flex; flex-direction: column; padding: 24px 20px; z-index: 100; }
         .sidebar-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding: 0 10px; }
         .sidebar-logo img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #F4F7FE; padding: 4px; }
@@ -94,45 +80,31 @@ if($pesanan['status'] == 'dibatalkan' || $pesanan['status'] == 'batal') $badge_c
         .sidebar-menu a i { font-size: 18px; width: 24px; text-align: center; }
         .sidebar-menu a:hover { background: #F4F7FE; color: #5A738E; }
         .sidebar-menu a.active { background: #5A738E; color: #ffffff; box-shadow: 0 4px 12px rgba(90, 115, 142, 0.3); }
-
-        /* --- MAIN CONTENT --- */
         .main-wrapper { margin-left: 260px; width: calc(100% - 260px); min-height: 100vh; padding: 30px 40px; display: flex; flex-direction: column; }
-        
         .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .topbar .page-title { font-size: 26px; font-weight: 700; color: #2B3674; }
-        
-        /* --- TABLES & GRIDS --- */
         .table-responsive { width: 100%; overflow-x: auto; }
         .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .data-table th { color: #A3AED0; font-weight: 500; font-size: 13px; text-transform: uppercase; padding: 16px; border-bottom: 1px solid #E9EDF7; text-align: left; }
         .data-table td { padding: 16px; font-size: 14px; color: #2B3674; font-weight: 500; border-bottom: 1px solid #F4F7FE; vertical-align: middle; }
         .data-table tr:last-child td { border-bottom: none; }
         .data-table tr:hover td { background: #F8FAFC; }
-
-        /* --- BADGES --- */
         .badge { padding: 6px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; text-transform: capitalize; }
         .badge-success { background: #E5F8ED; color: #05CD99; }
         .badge-warning { background: #FFF4E5; color: #FFB547; }
         .badge-danger { background: #FEECEE; color: #EE5D50; }
         .badge-blue { background: #E0F2FE; color: #0284C7; }
-
-        /* --- BUTTONS & INPUTS --- */
         .btn-primary { background: #5A738E; color: white; padding: 10px 20px; border-radius: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; transition: 0.3s; border: none; cursor: pointer; }
         .btn-primary:hover { background: #495e75; box-shadow: 0 4px 12px rgba(90, 115, 142, 0.3); transform: translateY(-2px); }
         .form-control { padding: 12px 16px; border: 2px solid #E9EDF7; border-radius: 12px; font-size: 14px; color: #2B3674; outline: none; transition: 0.3s; background: white; }
         .form-control:focus { border-color: #5A738E; }
-
         .prod-info { display: flex; align-items: center; gap: 12px; }
         .prod-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; background: #F4F7FE; padding: 2px; }
-
-        /* --- INVOICE STYLE --- */
         .invoice-card { max-width: 950px; margin: 0 auto; background: white; border-radius: 20px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); width: 100%; }
         .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px dashed #E9EDF7; padding-bottom: 24px; margin-bottom: 24px; }
-        
         .invoice-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
         .info-box { background: #F8FAFC; padding: 20px; border-radius: 16px; border: 1px solid #E9EDF7; }
         .info-box h4 { font-size: 12px; color: #A3AED0; text-transform: uppercase; margin-bottom: 12px; font-weight: 600; }
-        
         .invoice-total { display: flex; justify-content: flex-end; margin-top: 30px; background: #F8FAFC; padding: 24px; border-radius: 16px; }
         .total-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #5A738E; width: 300px; }
         .total-row.grand { font-size: 20px; font-weight: 700; color: #2B3674; border-top: 2px solid #E9EDF7; padding-top: 12px; margin-top: 4px; }

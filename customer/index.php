@@ -2,9 +2,6 @@
 session_start();
 require_once '../config/koneksi.php';
 
-// =========================================================================
-// LOGIKA TRENDING NOW (TOP 3 MINGGU INI)
-// =========================================================================
 $queryTrending = mysqli_query($conn, "
     SELECT dp.produk_id, dp.nama_parfum, dp.tipe, SUM(dp.jumlah) as total_terjual, pc.foto, pc.kategori 
     FROM detail_pesanan dp
