@@ -22,7 +22,6 @@ if(!$user_id) {
     }
 }
 
-// Pastikan kolom ulasan aman
 function ensure_ulasan_order_columns($conn) {
     $columns = [
         'pesanan_id' => "ALTER TABLE ulasan_pelanggan ADD pesanan_id INT(11) NULL AFTER id_pelanggan",
@@ -40,18 +39,11 @@ function ensure_ulasan_order_columns($conn) {
     }
 }
 ensure_ulasan_order_columns($conn);
-
-// =================================================================================
-// LOGIKA DOUBLE CONFIRMATION:
-// Jika pelanggan klik konfirmasi, ubah status pesanan menjadi 'selesai' (Tutup Buku)
-// =================================================================================
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'mark_taken') {
     $kode = mysqli_real_escape_string($conn, $_POST['kode'] ?? '');
     if($kode) {
-        // Hanya ubah jadi selesai JIKA peracik sudah mengubah status_pengambilan jadi diambil
         mysqli_query($conn, "UPDATE pesanan SET status = 'selesai' WHERE kode_pesanan = '$kode' AND user_id = $user_id AND status_pengambilan = 'diambil'");
     }
-    // Lempar kembali ke halaman ini agar form Rating terbuka
     header("Location: track_order_detail.php?kode=$kode");
     exit;
 }
@@ -111,17 +103,16 @@ if(count($items) === 0) {
 $db_status = strtolower(trim($pesanan['status']));
 $db_pengambilan = $pesanan['status_pengambilan'] ?? 'belum_diambil';
 
-// LOGIKA 4 TAHAP STEPPER
 $currentStep = 1;
 if ($db_status === 'selesai' || $db_pengambilan === 'diambil') {
-    $currentStep = 4; // Tahap 4: Diserahkan / Selesai
+    $currentStep = 4; 
 } elseif ($semua_selesai) {
-    $currentStep = 3; // Tahap 3: Siap Diambil
+    $currentStep = 3; 
 } elseif ($ada_diracik || $ada_selesai) {
-    $currentStep = 2; // Tahap 2: Diracik
+    $currentStep = 2; 
 }
 
-$isSelesaiTutupBuku = ($db_status === 'selesai'); // Flag untuk membuka Form Rating
+$isSelesaiTutupBuku = ($db_status === 'selesai'); 
 
 function get_status_ui($currentStep, $db_status, $db_pengambilan) {
     if ($db_status === 'selesai') {
@@ -180,7 +171,6 @@ function receipt_meta($item) {
 $namaPelanggan = $pesanan['nama_pemesan'] ?? '-';
 $noHp = $pesanan['no_hp'] ?? '-';
 
-// LOGIKA INPUT RATING (HANYA BISA JIKA STATUS = 'selesai')
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'submit_rating' && $isSelesaiTutupBuku) {
     $ratings = $_POST['rating'] ?? [];
     $komentars = $_POST['komentar'] ?? [];
@@ -263,7 +253,6 @@ $tanggalPesan = date('d', $tanggal) . ' ' . $bulan[(int)date('m', $tanggal) - 1]
         
         .panel { background: var(--white); border: 1.5px solid var(--sky); border-radius: 20px; padding: 35px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
         
-        /* GRID 4 STEPPER PROGRESS BAR */
         .tracker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; align-items: start; margin-bottom: 40px; position: relative; }
         .tracker-line-bg { position: absolute; top: 15px; left: 12%; right: 12%; height: 2px; background: var(--sky); z-index: 1; }
         .tracker-active-line { height: 100%; background: var(--navy); transition: width 0.5s ease; }
@@ -305,7 +294,6 @@ $tanggalPesan = date('d', $tanggal) . ' ' . $bulan[(int)date('m', $tanggal) - 1]
         .btn-success { background: var(--success); color: #fff; border-color: var(--success); }
         .btn-success:hover { background: #059669; }
         
-        /* RATING STYLING */
         .rating-panel h3 { font-size: 20px; margin-bottom: 8px; color: var(--navy); font-weight: 800; }
         .rating-panel > p { color: var(--teal); font-size: 14px; font-weight: 600; margin-bottom: 25px; }
         .rating-item { border-top: 1.5px solid var(--sky); padding-top: 20px; margin-top: 20px; }
@@ -329,7 +317,6 @@ $tanggalPesan = date('d', $tanggal) . ' ' . $bulan[(int)date('m', $tanggal) - 1]
         .rating-stars-readonly { color: #f5b83f; letter-spacing: 2px; font-size: 24px; margin: 10px 0; }
         .rating-comment-readonly { background: var(--white); border-radius: 12px; padding: 15px; color: var(--navy); font-size: 14px; font-weight: 600; line-height: 1.6; border: 1px solid var(--sky); }
         
-        /* CETAK STRUK PDF */
         @media print {
             body * { visibility: hidden; }
             .receipt, .receipt * { visibility: visible; }
@@ -357,7 +344,6 @@ $tanggalPesan = date('d', $tanggal) . ' ' . $bulan[(int)date('m', $tanggal) - 1]
         </section>
 
         <section class="panel">
-            <!-- 4 TAHAP PROGRESS BAR -->
             <div class="tracker">
                 <?php 
                     $steps = ['Dibayar', 'Diracik', 'Siap Diambil', 'Sudah Diambil']; 
@@ -407,7 +393,6 @@ $tanggalPesan = date('d', $tanggal) . ' ' . $bulan[(int)date('m', $tanggal) - 1]
                 </button>
             </div>
 
-            <!-- Header Rahasia untuk Print PDF -->
             <div style="display: none; text-align: center; margin-bottom: 30px;" class="print-only">
                 <h2 style="margin-bottom: 8px; color: var(--navy); font-weight: 800;">PERSCENTS.</h2>
                 <p style="font-size: 14px; color: var(--teal); font-weight: 600;">Kode Pesanan: <?= htmlspecialchars($pesanan['kode_pesanan']); ?></p>
@@ -444,16 +429,11 @@ $tanggalPesan = date('d', $tanggal) . ' ' . $bulan[(int)date('m', $tanggal) - 1]
             <p>PERSCENTS Lab (Itenas)<br>Jl. PHH. Mustofa No.23, Bandung<br>Buka: Senin - Sabtu, 10:00 - 17:00</p>
         </section>
 
-        <!-- ==================================================================== -->
-        <!-- LOGIKA DOUBLE CONFIRMATION & RATING -->
-        <!-- ==================================================================== -->
         
         <?php if($isSelesaiTutupBuku): ?>
-            <!-- FORM RATING HANYA TERBUKA JIKA STATUS SUDAH SELESAI -->
             <?php if(count($items) > 0): ?>
                 <section class="panel rating-panel">
                     <?php if($semuaSudahRating && !$modeEditRating): ?>
-                        <!-- JIKA SUDAH PERNAH RATING -->
                         <div class="rating-done-head">
                             <div>
                                 <h3>Rating Anda</h3>
@@ -486,7 +466,6 @@ $tanggalPesan = date('d', $tanggal) . ' ' . $bulan[(int)date('m', $tanggal) - 1]
                             <a href="track_order.php?tab=selesai" class="btn">Kembali ke Riwayat</a>
                         </div>
                     <?php else: ?>
-                        <!-- JIKA BELUM RATING ATAU MODE EDIT RATING -->
                         <h3><?= $modeEditRating ? 'Edit Ulasan Anda' : 'Beri Ulasan Pesanan'; ?></h3>
                         <p>Nilai racikan parfum yang telah Anda terima.</p>
                         
@@ -527,11 +506,9 @@ $tanggalPesan = date('d', $tanggal) . ' ' . $bulan[(int)date('m', $tanggal) - 1]
             <?php endif; ?>
             
         <?php else: ?>
-            <!-- JIKA BELUM SELESAI, TAMPILKAN TOMBOL KONFIRMASI ATAU KEMBALI -->
             <div class="actions">
                 
                 <?php if($db_pengambilan === 'diambil' && $db_status !== 'selesai'): ?>
-                    <!-- TOMBOL DOUBLE CONFIRMATION MUNCUL HANYA SETELAH PERACIK KLIK 'DIAMBIL' -->
                     <form method="post" style="grid-column: 1 / -1; margin: 0;">
                         <input type="hidden" name="kode" value="<?= htmlspecialchars($pesanan['kode_pesanan']); ?>">
                         <input type="hidden" name="action" value="mark_taken">
@@ -542,7 +519,6 @@ $tanggalPesan = date('d', $tanggal) . ' ' . $bulan[(int)date('m', $tanggal) - 1]
                     </form>
                     
                 <?php elseif($semua_selesai): ?>
-                    <!-- JIKA PERACIK BELUM KLIK, TOMBOL KONFIRMASI DI-HIDDEN DAN DIGANTI NOTIFIKASI -->
                     <div style="grid-column: 1 / -1; text-align: center; background: #e0f2fe; color: #0369a1; padding: 15px; border-radius: 12px; font-weight: 800; font-size: 13px; border: 1.5px dashed #bae6fd;">
                         Menunggu Peracik menyerahkan pesanan Anda...
                     </div>

@@ -2,7 +2,6 @@
 session_start();
 require_once '../config/koneksi.php';
 
-// Jika sudah login, tendang balik
 if(isset($_SESSION['pelanggan_id'])) {
     header("Location: index.php");
     exit;
@@ -11,35 +10,25 @@ if(isset($_SESSION['pelanggan_id'])) {
 $pesan_error = '';
 $pesan_sukses = '';
 
-// ==========================================
-// LOGIKA RESET PASSWORD
-// ==========================================
 if(isset($_POST['reset_password'])) {
-    // Paksa email jadi huruf kecil untuk pencocokan
     $email = strtolower(mysqli_real_escape_string($conn, trim($_POST['email'])));
     $nama = mysqli_real_escape_string($conn, trim($_POST['nama_lengkap']));
     
-    // Hash password baru
     $password_baru = password_hash($_POST['password_baru'], PASSWORD_DEFAULT); 
 
-    // Cek apakah kombinasi Email dan Nama Lengkap benar-benar ada dan cocok
     $cek_akun = mysqli_query($conn, "SELECT id FROM pelanggan WHERE email = '$email' AND nama_lengkap = '$nama'");
     
     if(mysqli_num_rows($cek_akun) > 0) {
-        // Jika cocok, langsung hajar update passwordnya di tabel pelanggan
         $update_pelanggan = mysqli_query($conn, "UPDATE pelanggan SET password = '$password_baru' WHERE email = '$email'");
         
-        // Jangan lupa update juga di tabel users agar sinkron saat checkout
         $update_users = mysqli_query($conn, "UPDATE users SET password = '$password_baru' WHERE email = '$email'");
 
         if($update_pelanggan) {
-            // Beri tahu pelanggan bahwa reset sukses, lalu arahkan mereka pakai tombol kembali ke login
             $pesan_sukses = "Password berhasil diubah! Silakan kembali ke halaman Login untuk masuk.";
         } else {
             $pesan_error = "Terjadi kesalahan sistem saat memperbarui password.";
         }
     } else {
-        // Jika nama atau email salah/tidak cocok
         $pesan_error = "Data tidak ditemukan! Pastikan Email dan Nama Lengkap sama persis dengan saat pendaftaran.";
     }
 }
@@ -54,7 +43,6 @@ if(isset($_POST['reset_password'])) {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* PALET WARNA SIGNATURE */
         :root {
             --navy: #2F4156;
             --teal: #567C8D;
@@ -70,12 +58,10 @@ if(isset($_POST['reset_password'])) {
         a { text-decoration: none; color: var(--teal); font-weight: 700; transition: 0.3s; cursor: pointer; }
         a:hover { color: var(--navy); }
 
-        /* Blob Backgrounds */
         .blob { position: absolute; border-radius: 50%; filter: blur(60px); z-index: -1; opacity: 0.6; }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: var(--sky-blue); }
         .blob-2 { bottom: -10%; right: -5%; width: 400px; height: 400px; background: var(--teal); }
 
-        /* MAIN CONTAINER GLASSMORPHISM (Dibuat lebih kecil & di tengah) */
         .auth-container { width: 500px; max-width: 95%; background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 32px; box-shadow: 0 20px 50px rgba(47, 65, 86, 0.1); padding: 50px; position: relative; z-index: 10; }
         
         .auth-container h3 { font-size: 28px; font-weight: 800; color: var(--navy); margin-bottom: 10px; text-align: center; }

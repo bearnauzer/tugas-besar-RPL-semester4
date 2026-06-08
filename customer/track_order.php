@@ -57,7 +57,7 @@ $queryPesanan = mysqli_query($conn, "
     FROM pesanan p
     JOIN detail_pesanan dp ON dp.pesanan_id = p.id
     WHERE p.user_id = $user_id
-      AND LOWER(TRIM(p.status)) IN ($statusSudahDibayarSql)
+    AND LOWER(TRIM(p.status)) IN ($statusSudahDibayarSql)
     GROUP BY p.id
     ORDER BY p.created_at DESC
 ");

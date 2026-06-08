@@ -17,17 +17,13 @@ function ensure_ulasan_rating_columns($conn) {
 
 ensure_ulasan_rating_columns($conn);
 
-// Cek apakah ada kategori yang dikirim dari shop.php
 if (!isset($_GET['kategori']) || empty($_GET['kategori'])) {
-    // Kalau nggak ada kategori, tendang balik ke shop
     header("Location: shop.php");
     exit;
 }
 
-// Ambil kategori dari URL dan amankan
 $kategori_req = mysqli_real_escape_string($conn, strtolower(trim($_GET['kategori'])));
 
-// Tarik data HANYA untuk kategori tersebut dari database
 $queryKoleksi = mysqli_query($conn, "
     SELECT pc.*, COALESCE(AVG(u.rating), 0) AS avg_rating, COUNT(u.id) AS total_rating
     FROM produk_collection pc
@@ -37,7 +33,6 @@ $queryKoleksi = mysqli_query($conn, "
     ORDER BY pc.nama ASC
 ");
 
-// Set judul dinamis
 $judul_halaman = "Koleksi " . ucfirst($kategori_req);
 $deskripsi_halaman = "Eksplorasi mahakarya wewangian yang diracik khusus untuk " . ucfirst($kategori_req) . ".";
 ?>
@@ -51,7 +46,6 @@ $deskripsi_halaman = "Eksplorasi mahakarya wewangian yang diracik khusus untuk "
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* PALET WARNA SIGNATURE */
         :root {
             --navy: #2F4156;
             --teal: #567C8D;
@@ -66,12 +60,10 @@ $deskripsi_halaman = "Eksplorasi mahakarya wewangian yang diracik khusus untuk "
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--beige); color: var(--navy); overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
         
-        /* Blobs */
         .blob { position: absolute; border-radius: 50%; filter: blur(60px); z-index: -1; opacity: 0.5; }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: var(--sky-blue); }
         .blob-2 { top: 40%; right: -5%; width: 400px; height: 400px; background: var(--teal); }
 
-        /* NAVBAR */
         nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1200px; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 100px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); }
         .logo { font-size: 20px; font-weight: 800; color: var(--navy); }
         .nav-links { display: flex; gap: 30px; }
@@ -87,16 +79,13 @@ $deskripsi_halaman = "Eksplorasi mahakarya wewangian yang diracik khusus untuk "
         .btn-logout { width: 44px; height: 44px; padding: 0; border: none; background: transparent; color: var(--navy); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn-logout svg { width: 24px; height: 24px; color: currentColor; }
 
-        /* HEADER */
         .page-header { max-width: 1200px; margin: 150px auto 60px; padding: 0 20px; text-align: center; }
         .page-header h1 { font-size: 48px; font-weight: 800; color: var(--navy); letter-spacing: -1.5px; margin-bottom: 15px; text-transform: capitalize; }
         .page-header p { font-size: 16px; color: var(--teal); font-weight: 500; max-width: 600px; margin: 0 auto; line-height: 1.6; }
 
-        /* KEMBALI BUTTON */
         .btn-back-shop { display: inline-flex; align-items: center; gap: 8px; color: var(--teal); font-weight: 700; font-size: 14px; margin-bottom: 30px; transition: 0.3s; }
         .btn-back-shop:hover { color: var(--navy); transform: translateX(-5px); }
 
-        /* KOLEKSI GRID */
         .koleksi-wrapper { max-width: 1200px; margin: 0 auto 100px; padding: 0 20px; }
         .koleksi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
         
@@ -199,7 +188,6 @@ $deskripsi_halaman = "Eksplorasi mahakarya wewangian yang diracik khusus untuk "
             <?php 
                 }
             } else {
-                // Kalau datanya kosong di database
                 echo "<div style='grid-column: 1/-1; text-align: center; padding: 50px; background: var(--white); border-radius: 24px; border: 1px dashed var(--teal);'>";
                 echo "<h3 style='color: var(--navy); margin-bottom: 10px;'>Katalog Kosong</h3>";
                 echo "<p style='color: var(--teal);'>Belum ada parfum untuk kategori " . ucfirst($kategori_req) . ".</p>";

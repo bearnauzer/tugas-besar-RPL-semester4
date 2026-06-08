@@ -55,7 +55,6 @@ if (isset($_POST['login'])) {
         }
 
         body {
-            /* Background Image dengan overlay gelap agar tulisan terbaca */
             background-image: linear-gradient(rgba(47, 65, 86, 0.7), rgba(47, 65, 86, 0.7)), url('../assets/dokumentasi/foto_background.jpg');
             background-size: cover;
             background-position: center;
@@ -71,7 +70,7 @@ if (isset($_POST['login'])) {
         .login-container {
             width: 100%;
             max-width: 440px;
-            background: rgba(255, 255, 255, 0.95); /* Sedikit transparan agar menyatu dengan foto */
+            background: rgba(255, 255, 255, 0.95); 
             backdrop-filter: blur(10px);
             border-radius: 24px;
             padding: 50px 45px;

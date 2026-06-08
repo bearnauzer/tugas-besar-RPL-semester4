@@ -2,7 +2,6 @@
 session_start();
 require_once '../config/koneksi.php';
 
-// Ambil semua ulasan dari database
 $queryUlasan = mysqli_query($conn, "SELECT * FROM ulasan_pelanggan ORDER BY id DESC");
 ?>
 
@@ -26,12 +25,10 @@ $queryUlasan = mysqli_query($conn, "SELECT * FROM ulasan_pelanggan ORDER BY id D
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--beige); color: var(--navy); overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
 
-        /* Blobs */
         .blob { position: fixed; border-radius: 50%; filter: blur(60px); z-index: -1; opacity: 0.6; }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: var(--sky-blue); }
         .blob-2 { bottom: -10%; right: -5%; width: 600px; height: 600px; background: var(--teal); }
 
-        /* NAVBAR (Sama seperti index) */
         nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1200px; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 100px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); }
         .logo { font-size: 20px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px; }
         .nav-links { display: flex; gap: 30px; }
@@ -40,12 +37,10 @@ $queryUlasan = mysqli_query($conn, "SELECT * FROM ulasan_pelanggan ORDER BY id D
         .btn-back { padding: 10px 24px; background: var(--navy); color: var(--white); border-radius: 100px; font-weight: 700; font-size: 14px; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; }
         .btn-back:hover { background: var(--teal); transform: translateY(-2px); }
 
-        /* HEADER HALAMAN */
         .page-header { text-align: center; margin: 150px auto 60px; padding: 0 20px; }
         .page-header h1 { font-size: 48px; font-weight: 800; color: var(--navy); letter-spacing: -1px; margin-bottom: 15px; }
         .page-header p { font-size: 16px; color: var(--teal); font-weight: 500; max-width: 600px; margin: 0 auto; }
 
-        /* MASONRY/GRID ULASAN */
         .reviews-container { max-width: 1200px; margin: 0 auto 100px; padding: 0 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
         
         .review-card { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 40px; border-radius: 32px; transition: 0.4s; box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column; }

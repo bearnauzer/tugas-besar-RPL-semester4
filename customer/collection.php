@@ -17,14 +17,9 @@ function ensure_ulasan_rating_columns($conn) {
 
 ensure_ulasan_rating_columns($conn);
 
-// ==========================================
-// LOGIKA "LOCK-DOWN" KATEGORI
-// ==========================================
-// Cek apakah ada request kategori (pria/wanita/anak) dari shop.php
 if (isset($_GET['kategori'])) {
-    $kategori_req = strtolower(trim($_GET['kategori'])); // Ubah ke huruf kecil biar aman sama database
+    $kategori_req = strtolower(trim($_GET['kategori'])); 
     
-    // Tarik data HANYA untuk kategori tersebut. Yang lain GAK BOLEH DIAKSES!
     $queryKoleksi  = mysqli_query($conn, "
         SELECT pc.*, COALESCE(AVG(u.rating), 0) AS avg_rating, COUNT(u.id) AS total_rating
         FROM produk_collection pc
@@ -37,9 +32,8 @@ if (isset($_GET['kategori'])) {
     $judul_halaman = "Koleksi " . ucfirst($kategori_req);
     $deskripsi_halaman = "Eksplorasi mahakarya wewangian yang diracik khusus untuk " . ucfirst($kategori_req) . ".";
     
-    $tampilkan_filter = false; // KUNCI: Sembunyikan tombol filter
+    $tampilkan_filter = false; 
 } else {
-    // Kalau akses langsung tanpa milih (misal ngetik URL manual), tarik semua data
     $queryKoleksi = mysqli_query($conn, "
         SELECT pc.*, COALESCE(AVG(u.rating), 0) AS avg_rating, COUNT(u.id) AS total_rating
         FROM produk_collection pc
@@ -51,7 +45,7 @@ if (isset($_GET['kategori'])) {
     $judul_halaman = "Semua Koleksi";
     $deskripsi_halaman = "Eksplorasi mahakarya wewangian yang diracik khusus untuk setiap kepribadian dan usia.";
     
-    $tampilkan_filter = true; // Munculkan tombol filter
+    $tampilkan_filter = true; 
 }
 ?>
 
@@ -64,7 +58,6 @@ if (isset($_GET['kategori'])) {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* PALET WARNA SIGNATURE */
         :root {
             --navy: #2F4156;
             --teal: #567C8D;
@@ -79,12 +72,10 @@ if (isset($_GET['kategori'])) {
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--beige); color: var(--navy); overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
         
-        /* Blob Backgrounds */
         .blob { position: absolute; border-radius: 50%; filter: blur(60px); z-index: -1; opacity: 0.5; }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: var(--sky-blue); }
         .blob-2 { top: 40%; right: -5%; width: 400px; height: 400px; background: var(--teal); }
 
-        /* NAVBAR */
         nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1200px; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 100px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); }
         .logo { font-size: 20px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px; }
         .nav-links { display: flex; gap: 30px; }
@@ -100,18 +91,15 @@ if (isset($_GET['kategori'])) {
         .btn-logout { width: 44px; height: 44px; padding: 0; border: none; background: transparent; color: var(--navy); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn-logout svg { width: 24px; height: 24px; color: currentColor; }
 
-        /* HEADER SECTION */
         .page-header { max-width: 1200px; margin: 150px auto 40px; padding: 0 20px; text-align: center; }
         .page-header h1 { font-size: 48px; font-weight: 800; color: var(--navy); letter-spacing: -1.5px; margin-bottom: 15px; text-transform: capitalize; }
         .page-header p { font-size: 16px; color: var(--teal); font-weight: 500; max-width: 600px; margin: 0 auto; line-height: 1.6; }
 
-        /* FILTER TABS (Bisa disembunyikan lewat PHP) */
         .filter-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 50px; flex-wrap: wrap; padding: 0 20px; }
         .filter-btn { padding: 12px 30px; background: var(--white); color: var(--navy); border: 1px solid var(--sky-blue); border-radius: 100px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
         .filter-btn:hover { background: var(--sky-blue); transform: translateY(-2px); }
         .filter-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); box-shadow: 0 10px 20px rgba(47, 65, 86, 0.2); }
 
-        /* KOLEKSI GRID */
         .koleksi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto 100px; padding: 0 20px; }
         .koleksi-card { background: var(--white); border-radius: 24px; padding: 20px; border: 1px solid var(--sky-blue); transition: all 0.4s cubic-bezier(0.5, 0, 0, 1); display: flex; flex-direction: column; }
         .koleksi-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(47, 65, 86, 0.08); }
@@ -166,13 +154,11 @@ if (isset($_GET['kategori'])) {
         <?php endif; ?>
     </nav>
 
-    <!-- HEADER: Judul akan otomatis berubah (Koleksi Pria / Wanita / Anak) -->
     <div class="page-header">
         <h1><?= $judul_halaman; ?></h1>
         <p><?= $deskripsi_halaman; ?></p>
     </div>
 
-    <!-- HANYA MUNCUL JIKA TIDAK ADA KATEGORI SPESIFIK -->
     <?php if($tampilkan_filter): ?>
     <div class="filter-container">
         <button class="filter-btn active" data-filter="semua">Semua Koleksi</button>
@@ -182,18 +168,15 @@ if (isset($_GET['kategori'])) {
     </div>
     <?php endif; ?>
 
-    <!-- GRID KOLEKSI -->
     <div class="koleksi-grid" id="gridKoleksi">
         <?php 
         if(mysqli_num_rows($queryKoleksi) > 0) {
             while($item = mysqli_fetch_assoc($queryKoleksi)) {
                 $kategori_asli = $item['kategori'] ?? 'Unisex';
                 $foto_path = (!empty($item['foto'])) ? '../' . $item['foto'] : '../assets/perscents_kotak.png';
-                // Jika kamu belum pasang logic harga varian di sini, biarkan "Harga Varian" dulu
                 $harga = isset($item['harga']) ? 'Rp ' . number_format($item['harga'], 0, ',', '.') : 'Harga Varian';
         ?>
         
-        <!-- Setiap kartu akan diarahkan ke detail.php ketika diklik -->
         <div class="koleksi-card">
             <div class="card-img-box">
                 <div class="badge-kategori"><?= htmlspecialchars($kategori_asli); ?></div>
@@ -214,7 +197,6 @@ if (isset($_GET['kategori'])) {
             </div>
             <div class="card-action">
                 <div class="harga"><?= $harga; ?></div>
-                <!-- PENTING: Tombol beli diarahkan ke detail.php -->
                 <button class="btn-beli" onclick="window.location.href='detail.php?id=<?= $item['id']; ?>'">Beli</button>
             </div>
         </div>
@@ -231,7 +213,6 @@ if (isset($_GET['kategori'])) {
         <p>&copy; 2026 PERSCENTS. Crafted with passion.</p>
     </footer>
 
-    <!-- SCRIPT FILTER (Hanya aktif kalau tombol filternya dimunculkan) -->
     <?php if($tampilkan_filter): ?>
     <script>
         const filterBtns = document.querySelectorAll('.filter-btn');

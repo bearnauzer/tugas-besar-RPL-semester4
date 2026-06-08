@@ -11,7 +11,6 @@ $id_pelanggan = (int)$_SESSION['pelanggan_id'];
 $pesan_error = '';
 $pesan_sukses = '';
 
-// Cek apakah ada notifikasi sukses dari redirect
 if (isset($_GET['status']) && $_GET['status'] === 'sukses') {
     $pesan_sukses = 'Profil berhasil diperbarui.';
 }
@@ -63,7 +62,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profil'])) {
                 ");
                 $_SESSION['pelanggan_nama'] = $nama;
                 
-                // INI KUNCI FIX-NYA: Redirect paksa ke profil mode normal membawa status sukses
                 header("Location: profil.php?status=sukses");
                 exit;
                 

@@ -2,9 +2,6 @@
 require_once '../config/cek_akses.php';
 require_once '../config/koneksi.php';
 
-// =========================================================================
-// 1. STATISTIK KARTU ATAS
-// =========================================================================
 $qMenunggu = mysqli_query($conn, "SELECT COUNT(id) as total FROM detail_pesanan WHERE status_racik = 'menunggu'");
 $jmlMenunggu = mysqli_fetch_assoc($qMenunggu)['total'];
 
@@ -22,13 +19,9 @@ $qSelesaiHariIni = mysqli_query($conn, "
 ");
 $jmlSelesaiHariIni = mysqli_fetch_assoc($qSelesaiHariIni)['total'] ?? 0;
 
-// =========================================================================
-// 2. LOGIKA FILTER & PAGINATION DAFTAR PESANAN
-// =========================================================================
 $filter_status = isset($_GET['status']) ? mysqli_real_escape_string($conn, $_GET['status']) : 'semua';
 
 $where = "1=1";
-// Pengecekan filter: pisahkan yang merujuk ke tabel detail_pesanan (dp) dan pesanan (p)
 if (in_array($filter_status, ['menunggu', 'diracik', 'selesai'])) {
     $where .= " AND dp.status_racik = '$filter_status'";
 } elseif ($filter_status === 'belum_diambil') {
@@ -41,7 +34,6 @@ $limit = 5;
 $halaman = isset($_GET['halaman']) ? (int)$_GET['halaman'] : 1;
 $offset = ($halaman - 1) * $limit;
 
-// Menambahkan JOIN pada query count agar filter dari tabel pesanan (p) dapat terbaca
 $qCountData = mysqli_query($conn, "
     SELECT COUNT(dp.id) as total 
     FROM detail_pesanan dp 
@@ -51,7 +43,6 @@ $qCountData = mysqli_query($conn, "
 $total_data = mysqli_fetch_assoc($qCountData)['total'];
 $total_halaman = ceil($total_data / $limit);
 
-// Mengubah ORDER BY menjadi DESC agar data terbaru muncul duluan
 $queryDaftarRacik = mysqli_query($conn, "
     SELECT 
         dp.*, 
@@ -80,10 +71,8 @@ $url_params = "&status=" . urlencode($filter_status);
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: #f4f6f9; color: #333; }
 
-        /* LAYOUT UTAMA */
         .app-layout { display: flex; min-height: 100vh; }
 
-        /* SIDEBAR KIRI */
         .sidebar { width: 260px; background-color: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 25px 20px; position: sticky; top: 0; height: 100vh; }
         
         .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding-left: 5px; }
@@ -102,16 +91,13 @@ $url_params = "&status=" . urlencode($filter_status);
         .sidebar-nav .logout:hover { background-color: #fee2e2; color: #dc2626; }
         .sidebar-nav .logout svg { stroke: currentColor; }
 
-        /* KONTEN KANAN */
         .main-content { flex: 1; padding: 40px; overflow-y: auto; }
         .container { max-width: 1000px; margin: 0 auto; }
         
-        /* PAGE TITLE */
         .page-title { margin-bottom: 30px; }
         .page-title h2 { font-size: 24px; color: #1e293b; margin-bottom: 5px; font-weight: 700; }
         .page-title p { font-size: 14px; color: #64748b; }
 
-        /* STAT CARDS */
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .stat-info span { display: block; font-size: 13px; color: #64748b; margin-top: 5px; font-weight: 500; }
@@ -122,7 +108,6 @@ $url_params = "&status=" . urlencode($filter_status);
         .bg-green { background-color: #f0fdf4; color: #22c55e; }
         .bg-gray { background-color: #f1f5f9; color: #64748b; }
 
-        /* FILTER TABS */
         .filter-container { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px 20px; display: flex; align-items: center; gap: 20px; margin-bottom: 25px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
         .filter-label { font-size: 14px; color: #475569; display: flex; align-items: center; gap: 8px; font-weight: 600; }
         .filter-tabs { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -130,7 +115,6 @@ $url_params = "&status=" . urlencode($filter_status);
         .btn-filter:hover { background-color: #e2e8f0; }
         .btn-filter.active { background-color: #5A738E; color: white; border-color: #5A738E; box-shadow: 0 2px 4px rgba(90, 115, 142, 0.2); }
 
-        /* ORDER CARDS LIST */
         .order-list { display: flex; flex-direction: column; gap: 15px; }
         .order-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; text-decoration: none; color: inherit; display: block; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.02); overflow: hidden; }
         .order-card:hover { border-color: #cbd5e1; box-shadow: 0 6px 12px rgba(0,0,0,0.05); transform: translateY(-2px); }
@@ -156,7 +140,6 @@ $url_params = "&status=" . urlencode($filter_status);
         
         .order-foot { padding: 16px 20px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; font-size: 14px; color: #475569; }
 
-        /* Pagination */
         .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 13px; margin-top: 40px; }
         .pagination a { text-decoration: none; padding: 8px 14px; border-radius: 6px; border: 1px solid #cbd5e1; color: #475569; transition: 0.2s; font-weight: 600; background: white; }
         .pagination a:hover { background-color: #f1f5f9; }

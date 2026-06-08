@@ -4,15 +4,11 @@ require_once '../config/koneksi.php';
 
 $id_pesanan = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// =========================================================================
-// PASTIKAN KOLOM status_pengambilan ADA DI DATABASE (Mencegah Error)
-// =========================================================================
 $check = mysqli_query($conn, "SHOW COLUMNS FROM pesanan LIKE 'status_pengambilan'");
 if($check && mysqli_num_rows($check) === 0) {
     mysqli_query($conn, "ALTER TABLE pesanan ADD status_pengambilan ENUM('belum_diambil','diambil') NOT NULL DEFAULT 'belum_diambil' AFTER status");
 }
 
-// Proses Update Status Racik
 if (isset($_POST['update_status_racik'])) {
     $id_detail = (int)$_POST['id_detail'];
     $status_racik_baru = mysqli_real_escape_string($conn, $_POST['status_racik']);
@@ -39,7 +35,6 @@ if (isset($_POST['update_status_racik'])) {
     exit;
 }
 
-// Proses Tandai Sudah Diambil
 if (isset($_POST['update_pengambilan'])) {
     mysqli_query($conn, "UPDATE pesanan SET status_pengambilan = 'diambil' WHERE id = $id_pesanan");
     echo "<script>window.location.href='detail_pesanan.php?id=$id_pesanan';</script>";
@@ -67,9 +62,6 @@ $queryDetail = mysqli_query($conn, "
     WHERE dp.pesanan_id = $id_pesanan
 ");
 
-// =========================================================================
-// LOGIKA AUTO-CHECKLIST SOP & PROGRESS BAR
-// =========================================================================
 $items = [];
 $semua_selesai = true; 
 $ada_yang_diracik = false;
@@ -94,7 +86,6 @@ if($queryDetail && mysqli_num_rows($queryDetail) > 0) {
 }
 $jumlah_item = count($items);
 
-// Logika Visual Stepper (Progress Bar) -> DIBUAT 4 TAHAP
 $step1_active = 'active'; 
 $step2_active = ($ada_yang_diracik || $jumlah_selesai > 0) ? 'active' : '';
 $step3_active = ($semua_selesai && $jumlah_item > 0) ? 'active' : '';
@@ -112,7 +103,6 @@ $step4_active = ($pesanan['status_pengambilan'] == 'diambil') ? 'active' : '';
         body { background-color: #f4f6f9; color: #333; }
         .app-layout { display: flex; min-height: 100vh; }
         
-        /* SIDEBAR */
         .sidebar { width: 260px; background-color: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 25px 20px; position: sticky; top: 0; height: 100vh; z-index: 10; }
         .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding-left: 5px; }
         .brand-logo { width: 40px; height: 40px; background-color: #5A738E; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -126,31 +116,25 @@ $step4_active = ($pesanan['status_pengambilan'] == 'diambil') ? 'active' : '';
         .sidebar-nav a.active svg { stroke: white; }
         .sidebar-nav .logout { margin-top: auto; color: #ef4444; }
 
-        /* KONTEN UTAMA */
         .main-content { flex: 1; padding: 30px 40px; overflow-y: auto; }
         .header-action { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .btn-back { display: flex; align-items: center; gap: 8px; color: #64748b; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.2s; }
         .btn-back:hover { color: #1e293b; }
 
-        /* TRACKER PROGRESS BAR 4 TAHAP */
         .order-tracker { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
         .tracker-title { font-size: 16px; color: #1e293b; font-weight: bold; margin-bottom: 25px; }
         .stepper { display: flex; justify-content: space-between; position: relative; max-width: 700px; margin: 0 auto; }
-        /* Garis penghubung */
         .stepper::before { content: ''; position: absolute; top: 20px; left: 12%; right: 12%; height: 2px; background: #e2e8f0; z-index: 1; }
         
         .step { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 25%; }
         .step-circle { width: 42px; height: 42px; border-radius: 50%; background: white; border: 2px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #94a3b8; font-size: 16px; transition: 0.3s; }
         .step-label { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
         
-        /* State Aktif (Warna Biru) */
         .step.active .step-circle { background: #3b82f6; border-color: #3b82f6; color: white; box-shadow: 0 0 0 4px #eff6ff; }
         .step.active .step-label { color: #1e293b; }
         
-        /* State Selesai Semua (Warna Hijau) */
         .stepper.all-done .step.active .step-circle { background: #16a34a; border-color: #16a34a; box-shadow: 0 0 0 4px #dcfce7; }
 
-        /* GRID LAYOUT (Kiri Resep, Kanan Checklist) */
         .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
 
         .recipe-list { display: flex; flex-direction: column; gap: 20px; }
@@ -175,7 +159,6 @@ $step4_active = ($pesanan['status_pengambilan'] == 'diambil') ? 'active' : '';
         .spec-box p { font-size: 12px; color: #64748b; font-weight: 600; margin-bottom: 4px; text-transform: uppercase; }
         .spec-box h4 { font-size: 16px; color: #1e293b; }
         
-        /* Aksen Aroma Styling */
         .recipe-notes { background: #faf5ff; border: 1px dashed #d8b4fe; padding: 15px; border-radius: 8px; margin-top: 5px; }
         .recipe-notes p { font-size: 12px; color: #7e22ce; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
         .aksen-container { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -185,7 +168,6 @@ $step4_active = ($pesanan['status_pengambilan'] == 'diambil') ? 'active' : '';
         .recipe-action label { font-size: 14px; font-weight: 600; color: #475569; }
         .select-status { padding: 10px 15px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; min-width: 200px; transition: 0.2s; }
         
-        /* PANEL SOP CHECKLIST */
         .sop-panel { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; position: sticky; top: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
         .sop-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
         .sop-header h3 { font-size: 18px; color: #1e293b; }
@@ -195,7 +177,6 @@ $step4_active = ($pesanan['status_pengambilan'] == 'diambil') ? 'active' : '';
         .check-item label { font-size: 14px; color: #475569; cursor: pointer; line-height: 1.4; transition: 0.2s; }
         .check-item input[type="checkbox"]:checked + label { text-decoration: line-through; color: #94a3b8; }
         
-        /* INFO PELANGGAN CARD */
         .customer-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 25px; display: flex; gap: 40px; align-items: center; }
         .cust-info { display: flex; align-items: center; gap: 12px; }
         .cust-icon { width: 40px; height: 40px; background: #f1f5f9; color: #3b82f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; }

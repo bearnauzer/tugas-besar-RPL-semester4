@@ -9,7 +9,6 @@ if(!isset($_SESSION['pelanggan_id'])) {
 
 $id_pelanggan = $_SESSION['pelanggan_id'];
 
-// Hapus item keranjang bila tombol sampah ditekan
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hapus_id'])) {
     $hapus_id = intval($_POST['hapus_id']);
     if($hapus_id > 0) {
@@ -19,7 +18,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['hapus_id'])) {
     exit;
 }
 
-// Query super canggih untuk menarik data keranjang (baik katalog maupun custom) sekaligus
 $queryKeranjang = mysqli_query($conn, "
     SELECT k.*, 
            pv.id_produk, p.nama AS nama_katalog, p.gambar AS gambar_katalog,
@@ -97,18 +95,16 @@ $total_belanja = 0;
 
         <?php if(mysqli_num_rows($queryKeranjang) > 0): ?>
             
-            <!-- LIST ITEM KERANJANG -->
             <?php while($item = mysqli_fetch_assoc($queryKeranjang)): 
                 $total_belanja += $item['subtotal'];
                 
-                // Cek apakah ini katalog atau custom untuk nama dan gambar
                 if($item['tipe'] == 'katalog') {
                     $nama_produk = $item['nama_katalog'];
                     $gambar_produk = (!empty($item['gambar_katalog'])) ? '../' . $item['gambar_katalog'] : '../assets/perscents_kotak.png';
                     $badge_class = 'badge-katalog';
                 } else {
                     $nama_produk = $item['nama_custom'];
-                    $gambar_produk = '../assets/perscents_kotak.png'; // Bisa diganti logo botol lab custom
+                    $gambar_produk = '../assets/perscents_kotak.png'; 
                     $badge_class = 'badge-custom';
                 }
             ?>
@@ -132,7 +128,6 @@ $total_belanja = 0;
             </div>
             <?php endwhile; ?>
 
-            <!-- BOX TOTAL & CHECKOUT -->
             <div class="checkout-box">
                 <div>
                     <div class="total-label">Total Belanja</div>

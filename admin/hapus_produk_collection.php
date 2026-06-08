@@ -2,7 +2,6 @@
 require_once '../config/cek_akses.php';
 require_once '../config/koneksi.php';
 
-// Tangkap ID dari URL
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($id === 0) {
@@ -10,9 +9,7 @@ if ($id === 0) {
     exit;
 }
 
-// Jika tombol "Yakin, Hapus" ditekan (mengirim parameter confirm=yes)
 if (isset($_GET['confirm']) && $_GET['confirm'] == 'yes') {
-    // Eksekusi penghapusan data
     $query_delete = "DELETE FROM produk_collection WHERE id = $id";
     
     if (mysqli_query($conn, $query_delete)) {
@@ -23,11 +20,9 @@ if (isset($_GET['confirm']) && $_GET['confirm'] == 'yes') {
     exit;
 }
 
-// Ambil nama produk untuk ditampilkan di pesan konfirmasi
 $query_nama = mysqli_query($conn, "SELECT nama FROM produk_collection WHERE id = $id");
 $data = mysqli_fetch_assoc($query_nama);
 
-// Jika ID tidak ditemukan di database, langsung tendang balik
 if (!$data) {
     echo "<script>alert('Data tidak ditemukan!'); window.location.href='produk.php';</script>";
     exit;

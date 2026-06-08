@@ -2,13 +2,9 @@
 require_once '../config/cek_akses.php';
 require_once '../config/koneksi.php';
 
-// 1. Query Top Cards
 $queryStokSedikit = mysqli_query($conn, "SELECT nama, stok FROM produk_collection WHERE stok <= 10 ORDER BY stok ASC LIMIT 4");
 $queryStokBanyak = mysqli_query($conn, "SELECT nama, stok FROM produk_collection ORDER BY stok DESC LIMIT 4");
 
-// =========================================================================
-// LOGIKA FILTER, SEARCH, & PAGINATION
-// =========================================================================
 $search_produk = isset($_GET['cari_produk']) ? mysqli_real_escape_string($conn, $_GET['cari_produk']) : '';
 $kategori_produk = isset($_GET['kategori_produk']) ? mysqli_real_escape_string($conn, $_GET['kategori_produk']) : '';
 
@@ -30,7 +26,6 @@ $total_halaman_produk = ceil($total_data_produk / $limit_produk);
 
 $queryProduk = mysqli_query($conn, "SELECT * FROM produk_collection $where_produk ORDER BY id DESC LIMIT $limit_produk OFFSET $offset_produk");
 
-// BAHAN BAKU
 $search_bahan = isset($_GET['cari_bahan']) ? mysqli_real_escape_string($conn, $_GET['cari_bahan']) : '';
 $kategori_bahan = isset($_GET['kategori_bahan']) ? mysqli_real_escape_string($conn, $_GET['kategori_bahan']) : '';
 
@@ -64,7 +59,6 @@ $params_produk_only = "&halaman_produk=$halaman_produk&cari_produk=" . urlencode
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: #F4F7FE; color: #2B3674; display: flex; font-size: 14px; }
         
-        /* --- SIDEBAR --- */
         .sidebar { width: 260px; background: #ffffff; height: 100vh; position: fixed; left: 0; top: 0; box-shadow: 4px 0 20px rgba(0,0,0,0.03); display: flex; flex-direction: column; padding: 24px 20px; z-index: 100; }
         .sidebar-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding: 0 10px; }
         .sidebar-logo img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #F4F7FE; padding: 4px; }
@@ -75,7 +69,6 @@ $params_produk_only = "&halaman_produk=$halaman_produk&cari_produk=" . urlencode
         .sidebar-menu a:hover { background: #F4F7FE; color: #5A738E; }
         .sidebar-menu a.active { background: #5A738E; color: #ffffff; box-shadow: 0 4px 12px rgba(90, 115, 142, 0.3); }
 
-        /* --- MAIN CONTENT --- */
         .main-wrapper { margin-left: 260px; width: calc(100% - 260px); min-height: 100vh; padding: 30px 40px; display: flex; flex-direction: column; }
         
         .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
@@ -85,7 +78,6 @@ $params_produk_only = "&halaman_produk=$halaman_produk&cari_produk=" . urlencode
         .admin-profile img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
         .admin-profile span { font-weight: 600; font-size: 14px; color: #2B3674; }
 
-        /* --- CARDS & GRIDS --- */
         .card { background: #ffffff; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 24px; border: none; transition: transform 0.2s ease; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.04); }
         .card h3 { font-size: 15px; color: #A3AED0; font-weight: 500; margin-bottom: 12px; }
@@ -97,7 +89,6 @@ $params_produk_only = "&halaman_produk=$halaman_produk&cari_produk=" . urlencode
         .stat-value { font-size: 32px; font-weight: 700; color: #2B3674; margin-bottom: 4px; }
         .stat-subtext { font-size: 13px; color: #05CD99; font-weight: 500; }
 
-        /* --- TABLES --- */
         .table-responsive { width: 100%; overflow-x: auto; }
         .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .data-table th { color: #A3AED0; font-weight: 500; font-size: 13px; text-transform: uppercase; padding: 16px; border-bottom: 1px solid #E9EDF7; text-align: left; }
@@ -105,14 +96,12 @@ $params_produk_only = "&halaman_produk=$halaman_produk&cari_produk=" . urlencode
         .data-table tr:last-child td { border-bottom: none; }
         .data-table tr:hover td { background: #F8FAFC; }
 
-        /* --- BADGES --- */
         .badge { padding: 6px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; text-transform: capitalize; }
         .badge-success { background: #E5F8ED; color: #05CD99; }
         .badge-warning { background: #FFF4E5; color: #FFB547; }
         .badge-danger { background: #FEECEE; color: #EE5D50; }
         .badge-blue { background: #E0F2FE; color: #0284C7; }
 
-        /* --- BUTTONS & INPUTS --- */
         .btn-primary { background: #5A738E; color: white; padding: 10px 20px; border-radius: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; transition: 0.3s; border: none; cursor: pointer; }
         .btn-primary:hover { background: #495e75; box-shadow: 0 4px 12px rgba(90, 115, 142, 0.3); transform: translateY(-2px); }
         
@@ -140,7 +129,6 @@ $params_produk_only = "&halaman_produk=$halaman_produk&cari_produk=" . urlencode
 </head>
 <body>
 
-    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-logo">
             <img src="<?= $base_url; ?>/assets/Logo_Perscents.png" alt="Logo">
@@ -167,7 +155,6 @@ $params_produk_only = "&halaman_produk=$halaman_produk&cari_produk=" . urlencode
             </div>
         </header>
 
-        <!-- TOP WIDGETS -->
         <div class="grid-3">
             <div class="card" style="padding: 20px;">
                 <h3 style="color:#EE5D50; font-weight:600;"><i class="fa-solid fa-triangle-exclamation"></i> Stok Hampir Habis</h3>
@@ -202,7 +189,6 @@ $params_produk_only = "&halaman_produk=$halaman_produk&cari_produk=" . urlencode
             </div>
         </div>
 
-        <!-- TABEL PRODUK COLLECTION -->
         <section class="card">
             <h2>Daftar Produk Collection</h2>
             <form method="GET" action="produk.php">
@@ -280,7 +266,6 @@ $params_produk_only = "&halaman_produk=$halaman_produk&cari_produk=" . urlencode
             <?php endif; ?>
         </section>
 
-        <!-- TABEL BAHAN BAKU -->
         <section class="card">
             <h2>Daftar Bahan Baku Custom (Notes)</h2>
             <form method="GET" action="produk.php">

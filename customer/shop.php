@@ -11,9 +11,6 @@ session_start();
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* =========================================================
-           PALET WARNA SIGNATURE PERSCENTS
-           ========================================================= */
         :root {
             --navy: #2F4156;
             --teal: #567C8D;
@@ -28,17 +25,11 @@ session_start();
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--beige); color: var(--navy); overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
         a { text-decoration: none; color: inherit; }
 
-        /* =========================================================
-           BLOBS BACKGROUND (CIRI KHAS KITA)
-           ========================================================= */
         .blob { position: absolute; border-radius: 50%; filter: blur(60px); z-index: -1; opacity: 0.6; }
         .blob-1 { top: 10%; left: -10%; width: 500px; height: 500px; background: var(--sky-blue); }
         .blob-2 { top: 40%; right: -5%; width: 400px; height: 400px; background: var(--teal); }
         .blob-3 { bottom: -10%; left: 20%; width: 600px; height: 600px; background: var(--sky-blue); }
 
-        /* =========================================================
-           NAVBAR GLASSMORPHISM
-           ========================================================= */
         nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1200px; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 100px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); }
         .logo { font-size: 20px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px; }
         .nav-links { display: flex; gap: 30px; }
@@ -47,7 +38,6 @@ session_start();
         .btn-nav-login { padding: 10px 24px; background: var(--navy); color: var(--white); border-radius: 100px; font-weight: 700; font-size: 14px; transition: 0.3s; border: none; cursor: pointer; }
         .btn-nav-login:hover { background: var(--teal); transform: translateY(-2px); }
 
-        /* Navbar action buttons (match homepage) */
         .nav-actions { display: flex; gap: 10px; align-items: center; }
         .btn-profile { width: 44px; height: 44px; padding: 0; border: none; background: transparent; color: var(--navy); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn-profile svg { width: 24px; height: 24px; color: currentColor; }
@@ -58,9 +48,6 @@ session_start();
         .btn-logout { width: 44px; height: 44px; padding: 0; border: none; background: transparent; color: var(--navy); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn-logout svg { width: 24px; height: 24px; color: currentColor; }
 
-        /* =========================================================
-           WIZARD CONTAINER (ALUR BELANJA)
-           ========================================================= */
         .wizard-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 120px 20px 60px; position: relative; z-index: 2; }
         
         .step-section { text-align: center; width: 100%; max-width: 900px; transition: all 0.5s ease; }
@@ -76,9 +63,6 @@ session_start();
         .step-section h1 { font-size: 48px; font-weight: 800; color: var(--navy); margin-bottom: 15px; letter-spacing: -1.5px; line-height: 1.1; }
         .step-section p { font-size: 18px; color: var(--teal); font-weight: 500; margin-bottom: 60px; }
 
-        /* =========================================================
-           OPTION CARDS (TAMPILAN ALA KARTU TRENDING NOW)
-           ========================================================= */
         .card-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
         
         .option-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid var(--sky-blue); border-radius: 32px; padding: 50px 30px; width: 280px; cursor: pointer; transition: all 0.4s cubic-bezier(0.5, 0, 0, 1); display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 10px 30px rgba(47, 65, 86, 0.05); }
@@ -90,7 +74,6 @@ session_start();
         .option-card h3 { font-size: 24px; font-weight: 800; color: var(--navy); margin-bottom: 12px; }
         .option-card p { font-size: 14px; color: var(--teal); font-weight: 500; line-height: 1.6; }
 
-        /* TOMBOL KEMBALI KEKINIAN */
         .btn-back { display: inline-flex; align-items: center; gap: 10px; color: var(--teal); font-weight: 700; font-size: 15px; margin-top: 60px; cursor: pointer; transition: 0.3s; border: none; background: var(--white); padding: 12px 24px; border-radius: 100px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--sky-blue); }
         .btn-back:hover { color: var(--white); background: var(--navy); border-color: var(--navy); transform: translateX(-5px); }
     </style>
@@ -204,10 +187,8 @@ session_start();
 
         function chooseCategory(categoryName) {
             if (categoryName === 'Kids') {
-                // Langsung lempar ke file katalog_kategori.php
                 window.location.href = 'katalog_kategori.php?kategori=anak';
             } else {
-                // Simpan pilihan (ubah ke format database)
                 kategoriPilihan = (categoryName === 'Men') ? 'pria' : 'wanita';
                 
                 document.getElementById('badgeCategory').innerText = 'Category: ' + categoryName;
@@ -221,7 +202,6 @@ session_start();
         }
 
         function goToCollection() {
-            // Lempar ke file katalog_kategori.php
             window.location.href = 'katalog_kategori.php?kategori=' + kategoriPilihan;
         }
 

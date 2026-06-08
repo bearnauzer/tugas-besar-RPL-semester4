@@ -15,7 +15,6 @@ $trxGagal = mysqli_fetch_assoc($queryTrxGagal)['total'] ?? 0;
 
 $queryAktivitas = mysqli_query($conn, "SELECT kode_pesanan, total_harga, status, created_at FROM pesanan ORDER BY created_at DESC LIMIT 6");
 
-// FILTER & PAGINATION LOGIC
 $search_id = isset($_GET['cari_id']) ? mysqli_real_escape_string($conn, $_GET['cari_id']) : '';
 $status_trx = isset($_GET['status_trx']) ? mysqli_real_escape_string($conn, $_GET['status_trx']) : '';
 $tgl_mulai = isset($_GET['tgl_mulai']) ? mysqli_real_escape_string($conn, $_GET['tgl_mulai']) : '';
@@ -50,7 +49,6 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- GLOBAL MODERN UI --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: #F4F7FE; color: #2B3674; display: flex; font-size: 14px; }
         
@@ -65,7 +63,6 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
         .sidebar-menu a:hover { background: #F4F7FE; color: #5A738E; }
         .sidebar-menu a.active { background: #5A738E; color: #ffffff; box-shadow: 0 4px 12px rgba(90, 115, 142, 0.3); }
 
-        /* --- MAIN CONTENT --- */
         .main-wrapper { margin-left: 260px; width: calc(100% - 260px); min-height: 100vh; padding: 30px 40px; display: flex; flex-direction: column; }
         
         .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
@@ -75,7 +72,6 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
         .admin-profile img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
         .admin-profile span { font-weight: 600; font-size: 14px; color: #2B3674; }
 
-        /* --- CARDS & GRIDS --- */
         .card { background: #ffffff; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 24px; border: none; transition: transform 0.2s ease; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.04); }
         .card h3 { font-size: 15px; color: #A3AED0; font-weight: 500; margin-bottom: 12px; }
@@ -87,7 +83,6 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
         .stat-value { font-size: 32px; font-weight: 700; color: #2B3674; margin-bottom: 4px; }
         .stat-subtext { font-size: 13px; color: #05CD99; font-weight: 500; }
 
-        /* --- TABLES --- */
         .table-responsive { width: 100%; overflow-x: auto; }
         .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .data-table th { color: #A3AED0; font-weight: 500; font-size: 13px; text-transform: uppercase; padding: 16px; border-bottom: 1px solid #E9EDF7; text-align: left; }
@@ -95,14 +90,12 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
         .data-table tr:last-child td { border-bottom: none; }
         .data-table tr:hover td { background: #F8FAFC; }
 
-        /* --- BADGES --- */
         .badge { padding: 6px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; text-transform: capitalize; }
         .badge-success { background: #E5F8ED; color: #05CD99; }
         .badge-warning { background: #FFF4E5; color: #FFB547; }
         .badge-danger { background: #FEECEE; color: #EE5D50; }
         .badge-blue { background: #E0F2FE; color: #0284C7; }
 
-        /* --- BUTTONS & INPUTS --- */
         .btn-primary { background: #5A738E; color: white; padding: 10px 20px; border-radius: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; transition: 0.3s; border: none; cursor: pointer; }
         .btn-primary:hover { background: #495e75; box-shadow: 0 4px 12px rgba(90, 115, 142, 0.3); transform: translateY(-2px); }
         
@@ -114,23 +107,39 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
 
         .search-input, .select-filter, .form-control { padding: 12px 16px; border: 2px solid #E9EDF7; border-radius: 12px; font-size: 14px; color: #2B3674; outline: none; transition: 0.3s; background: white; }
         .search-input:focus, .select-filter:focus, .form-control:focus { border-color: #5A738E; }
-        .toolbar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-        .toolbar form { display: flex; gap: 12px; width: 100%; align-items: center; }
-
-        .prod-info { display: flex; align-items: center; gap: 12px; }
-        .prod-thumb { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; background: #F4F7FE; padding: 2px; }
-
+        
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
         .pagination a span { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; border: 1px solid #E9EDF7; color: #A3AED0; font-weight: 500; transition: 0.2s; }
         .pagination a { text-decoration: none; }
         .pagination a span:hover { background: #F4F7FE; color: #5A738E; }
         .pagination a span.active { background: #5A738E; color: white; border-color: #5A738E; }
+
+        .print-header { display: none; text-align: center; margin-bottom: 20px; }
+
+        @media print {
+            body { background: white !important; }
+            .sidebar, .topbar, form, .pagination, .side-aktivitas, .btn-icon { display: none !important; }
+            .main-wrapper { margin-left: 0 !important; width: 100% !important; padding: 0 !important; }
+            
+            .data-table th:last-child, .data-table td:last-child { display: none !important; }
+            
+            .card { box-shadow: none !important; border: 1px solid #E9EDF7 !important; padding: 15px !important; margin-bottom: 15px !important; }
+            .grid-2 { display: block !important; }
+            
+            .print-header { display: block !important; }
+            .print-header h2 { font-size: 24px; color: #2B3674; margin-bottom: 5px; }
+            .print-header p { font-size: 14px; color: #A3AED0; }
+            
+            .grid-3 { grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
+            
+            .card[style*="linear-gradient"] { background: white !important; border: 2px solid #5A738E !important; }
+            .card[style*="linear-gradient"] h3, .card[style*="linear-gradient"] .stat-value, .card[style*="linear-gradient"] .stat-subtext { color: #2B3674 !important; }
+        }
     </style>
 
 </head>
 <body>
 
-    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-logo">
             <img src="<?= $base_url; ?>/assets/Logo_Perscents.png" alt="Logo">
@@ -157,6 +166,11 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
             </div>
         </header>
 
+        <div class="print-header">
+            <h2>Laporan Pendapatan & Transaksi PERSCENTS</h2>
+            <p>Tanggal Cetak: <?= date('d F Y, H:i') ?> WIB</p>
+        </div>
+
         <div class="grid-3">
             <div class="card">
                 <h3>Transaksi Berhasil</h3>
@@ -176,7 +190,7 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
         </div>
 
         <div class="grid-2">
-            <div class="card">
+            <div class="card" style="width: 100%;">
                 <h2>Riwayat Transaksi</h2>
                 <form method="GET" action="pendapatan.php" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
                     <input type="text" name="cari_id" class="search-input" placeholder="ID Order..." value="<?= htmlspecialchars($search_id); ?>" style="flex: 1; min-width: 120px;">
@@ -190,6 +204,9 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
                     </select>
                     <button type="submit" class="btn-primary" style="padding: 0 16px;"><i class="fa-solid fa-filter"></i></button>
                     <a href="pendapatan.php" class="btn-primary" style="background:#EE5D50; padding: 0 16px;"><i class="fa-solid fa-rotate-right"></i></a>
+                    <a href="cetak_laporan.php?status_trx=<?= urlencode($status_trx); ?>&tgl_mulai=<?= urlencode($tgl_mulai); ?>&tgl_akhir=<?= urlencode($tgl_akhir); ?>" target="_blank" class="btn-primary" style="background:#05CD99; padding: 10px 20px; text-decoration:none;">
+                        <i class="fa-solid fa-file-pdf"></i> Download PDF
+                    </a>
                 </form>
 
                 <div class="table-responsive">
@@ -210,7 +227,7 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
                                 while($row = mysqli_fetch_assoc($queryMainTable)) { 
                                     $badge_class = "badge-warning";
                                     if($row['status'] == 'lunas') $badge_class = "badge-success";
-                                    if($row['status'] == 'batal') $badge_class = "badge-danger";
+                                    if($row['status'] == 'batal' || $row['status'] == 'dibatalkan') $badge_class = "badge-danger";
                             ?>
                             <tr>
                                 <td style="font-weight:700; color:#5A738E;">#<?= htmlspecialchars($row['kode_pesanan']); ?></td>
@@ -230,7 +247,7 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
                     <div style="font-size:13px; color:#A3AED0;">
                         Menampilkan <?= mysqli_num_rows($queryMainTable); ?> dari <?= $total_data; ?> Trx <br>
-                        <b>Total Filter: Rp <?= number_format($total_uang_filter, 0, ',', '.'); ?></b>
+                        <b>Total Nilai: Rp <?= number_format($total_uang_filter, 0, ',', '.'); ?></b>
                     </div>
                     <?php if ($total_halaman > 1): ?>
                     <div class="pagination" style="margin-top:0;">
@@ -242,15 +259,14 @@ $url_params = "&cari_id=" . urlencode($search_id) . "&status_trx=" . urlencode($
                 </div>
             </div>
 
-            <!-- SIDE AKTIVITAS -->
-            <div class="card" style="height: fit-content;">
+            <div class="card side-aktivitas" style="height: fit-content;">
                 <h2>Aktivitas Terbaru</h2>
                 <div style="display:flex; flex-direction:column; gap:16px;">
                     <?php if(mysqli_num_rows($queryAktivitas) > 0) {
                         while($act = mysqli_fetch_assoc($queryAktivitas)) { 
                             $badge_class = "badge-warning";
                             if($act['status'] == 'lunas') $badge_class = "badge-success";
-                            if($act['status'] == 'batal') $badge_class = "badge-danger";
+                            if($act['status'] == 'batal' || $act['status'] == 'dibatalkan') $badge_class = "badge-danger";
                     ?>
                         <div style="display:flex; justify-content:space-between; align-items:center; padding-bottom:12px; border-bottom:1px solid #E9EDF7;">
                             <div>

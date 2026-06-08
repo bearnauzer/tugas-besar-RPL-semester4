@@ -24,22 +24,17 @@ if(!$user_id) {
 
 $pesanan_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Ambil detail pesanan
 $query = mysqli_query($conn, "SELECT * FROM pesanan WHERE id = $pesanan_id AND user_id = $user_id");
 if(mysqli_num_rows($query) == 0) {
     die("Pesanan tidak ditemukan atau akses ditolak.");
 }
 $pesanan = mysqli_fetch_assoc($query);
 
-// =======================================================
-// LOGIKA UPLOAD BUKTI TRANSFER & SET ESTIMASI SELESAI
-// =======================================================
 if(isset($_POST['upload_bukti']) && isset($_FILES['file_bukti'])) {
     $file = $_FILES['file_bukti'];
     $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
     $filename = 'bukti_' . $pesanan_id . '_' . time() . '.' . $ext;
     
-    // Pastikan folder assets/pembayaran/ ada
     $target_dir = '../assets/pembayaran/';
     if (!file_exists($target_dir)) {
         @mkdir($target_dir, 0777, true);
@@ -48,14 +43,11 @@ if(isset($_POST['upload_bukti']) && isset($_FILES['file_bukti'])) {
     $target_file = $target_dir . $filename;
     
     if(move_uploaded_file($file['tmp_name'], $target_file)) {
-        // Path yang disimpan ke database
         $db_path = 'assets/pembayaran/' . $filename;
         
-        // SUNTIK ESTIMASI +2 HARI DISINI (Status tetap pending menunggu dicek Admin)
         $qUpdate = "UPDATE pesanan SET bukti_pembayaran = '$db_path', tenggat_selesai = DATE_ADD(NOW(), INTERVAL 2 DAY) WHERE id = $pesanan_id";
         
         if(mysqli_query($conn, $qUpdate)){
-            // Refresh halaman biar berubah jadi desain Struk
             header("Location: payment.php?id=$pesanan_id");
             exit;
         }
@@ -63,13 +55,11 @@ if(isset($_POST['upload_bukti']) && isset($_FILES['file_bukti'])) {
         echo "<script>alert('Gagal mengupload bukti pembayaran.');</script>";
     }
 }
-// AJAX endpoints for QRIS simulated payment
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
     header('Content-Type: application/json');
 
     if($action === 'init_qr') {
-        // create a per-session token for this pesanan
         $token = bin2hex(random_bytes(8));
         if(!isset($_SESSION['qris'])) $_SESSION['qris'] = [];
         $_SESSION['qris'][$pesanan_id] = ['token' => $token, 'expires' => time() + 60];
@@ -78,7 +68,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 
     if($action === 'mark_failed') {
-        // mark pesanan expired/failed
         $q = "UPDATE pesanan SET status = 'failed' WHERE id = $pesanan_id";
         mysqli_query($conn, $q);
         if(isset($_SESSION['qris'][$pesanan_id])) unset($_SESSION['qris'][$pesanan_id]);
@@ -117,7 +106,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         .btn-upload { width: 100%; padding: 16px; background: var(--navy); color: var(--white); border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 15px; }
         .btn-upload:hover { background: var(--teal); }
 
-        /* DESAIN STRUK */
         .struk-header { background: #e0f2fe; color: #0284c7; padding: 10px 20px; border-radius: 100px; font-size: 13px; font-weight: 800; display: inline-block; margin-bottom: 20px; }
         .struk-estimasi { background: var(--navy); color: var(--white); padding: 25px; border-radius: 16px; margin: 30px 0; }
         .struk-estimasi span { display: block; font-size: 14px; color: var(--sky-blue); margin-bottom: 8px; }
@@ -185,28 +173,23 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 </body>
 </html>
 <script>
-// Client-side QR timer and interaction
 document.addEventListener('DOMContentLoaded', function(){
     const metode = <?= json_encode($pesanan['metode_bayar']); ?>;
     if(metode === 'QRIS') {
-        // initialize token and get expires
         fetch('payment.php?id=' + <?= $pesanan_id; ?>, { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: 'action=init_qr' })
             .then(r => r.json()).then(data => {
                 if(data.ok) {
                     const token = data.token;
-                    const expiresAt = data.expires; // unix timestamp
-                    // Build QR payload (unique per transaction)
+                    const expiresAt = data.expires; 
                     const payload = 'pesanan:' + <?= $pesanan_id; ?> + '|kode:' + encodeURIComponent(<?= json_encode($pesanan['kode_pesanan']); ?>) + '|token:' + token;
                     const qrUrl = 'https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=' + encodeURIComponent(payload);
                     document.getElementById('qrisImg').src = qrUrl;
 
-                    // countdown
                     const countdownEl = document.getElementById('countdown');
                     let remaining = expiresAt - Math.floor(Date.now()/1000);
                     function updateCountdown(){
                         if(remaining <= 0) {
                             countdownEl.innerText = '00:00';
-                            // mark failed on server
                             fetch('payment.php?id=' + <?= $pesanan_id; ?>, { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: 'action=mark_failed' });
                             document.getElementById('qrisNote').innerText = 'Waktu habis. Pembayaran gagal.';
                             return;

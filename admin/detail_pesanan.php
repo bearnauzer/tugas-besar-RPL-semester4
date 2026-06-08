@@ -191,8 +191,7 @@ if($pesanan['status'] == 'dibatalkan' || $pesanan['status'] == 'batal') $badge_c
                             $path_foto = ($item['tipe'] == 'collection' && !empty($item['foto_collection'])) ? $item['foto_collection'] : 'assets/perscents_kotak.png';
                             $tipe_badge = ($item['tipe'] == 'custom') ? "<span class='badge' style='background:#F3E8FF; color:#7E22CE;'>Custom</span>" : "<span class='badge badge-blue'>Katalog</span>";
                             
-                            // Pewarnaan Badge Status Racik
-                            $bg_racik = "background: #FFF4E5; color: #FFB547;"; // Default kuning (menunggu)
+                            $bg_racik = "background: #FFF4E5; color: #FFB547;"; 
                             if(strtolower($item['status_racik']) == 'diracik') $bg_racik = "background: #E0F2FE; color: #0284C7;"; // Biru
                             if(strtolower($item['status_racik']) == 'selesai') $bg_racik = "background: #E5F8ED; color: #05CD99;"; // Hijau
                     ?>

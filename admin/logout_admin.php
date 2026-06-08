@@ -1,15 +1,11 @@
 <?php
 session_start();
 
-// Jika tombol "Yakin, Logout" ditekan (mengirim parameter confirm=yes di URL)
 if (isset($_GET['confirm']) && $_GET['confirm'] == 'yes') {
-    // Hapus semua variabel session
     session_unset();
     
-    // Hancurkan session sepenuhnya
     session_destroy();
     
-    // Arahkan kembali ke halaman login (sesuaikan path-nya jika perlu)
     echo "<script>
             alert('Anda berhasil logout! Sampai jumpa lagi.');
             window.location.href = 'login_admin.php';

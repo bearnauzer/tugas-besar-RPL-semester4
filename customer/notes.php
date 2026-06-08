@@ -2,7 +2,6 @@
 session_start();
 require_once '../config/koneksi.php';
 
-// Ambil semua data notes dari database, urutkan berdasarkan kategori agar rapi
 $queryNotes = mysqli_query($conn, "SELECT * FROM notes_aroma_custom ORDER BY kategori ASC, nama ASC");
 ?>
 
@@ -15,7 +14,6 @@ $queryNotes = mysqli_query($conn, "SELECT * FROM notes_aroma_custom ORDER BY kat
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* PALET WARNA SIGNATURE (TEDx Vibe) */
         :root {
             --navy: #2F4156;
             --teal: #567C8D;
@@ -30,12 +28,10 @@ $queryNotes = mysqli_query($conn, "SELECT * FROM notes_aroma_custom ORDER BY kat
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--beige); color: var(--navy); overflow-x: hidden; }
         a { text-decoration: none; color: inherit; }
         
-        /* Blob Backgrounds */
         .blob { position: absolute; border-radius: 50%; filter: blur(60px); z-index: -1; opacity: 0.5; }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: var(--sky-blue); }
         .blob-2 { top: 40%; right: -5%; width: 400px; height: 400px; background: var(--teal); }
 
-        /* NAVBAR (Sama dengan index) */
         nav { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1200px; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: var(--glass-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 100px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05); }
         .logo { font-size: 20px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px; }
         .nav-links { display: flex; gap: 30px; }
@@ -51,7 +47,6 @@ $queryNotes = mysqli_query($conn, "SELECT * FROM notes_aroma_custom ORDER BY kat
         .btn-logout { width: 44px; height: 44px; padding: 0; border: none; background: transparent; color: var(--navy); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn-logout svg { width: 24px; height: 24px; color: currentColor; }
 
-        /* HEADER SECTION */
         .page-header { max-width: 1200px; margin: 150px auto 50px; padding: 0 20px; display: flex; justify-content: space-between; align-items: flex-end; }
         .header-text h1 { font-size: 48px; font-weight: 800; color: var(--navy); letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 15px; }
         .header-text p { font-size: 16px; color: var(--teal); font-weight: 500; max-width: 500px; }
@@ -59,7 +54,6 @@ $queryNotes = mysqli_query($conn, "SELECT * FROM notes_aroma_custom ORDER BY kat
         .btn-beli { padding: 16px 32px; background: var(--teal); color: var(--white); border-radius: 100px; font-weight: 700; font-size: 16px; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; border: none; cursor: pointer; box-shadow: 0 10px 20px rgba(86, 124, 141, 0.2); }
         .btn-beli:hover { background: var(--navy); transform: translateY(-3px); box-shadow: 0 15px 25px rgba(47, 65, 86, 0.3); }
 
-        /* NOTES GRID SECTION */
         .notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto 100px; padding: 0 20px; }
         
         .note-card { background: var(--white); border-radius: 24px; padding: 20px; border: 1px solid var(--sky-blue); transition: 0.3s; display: flex; flex-direction: column; }
@@ -68,7 +62,6 @@ $queryNotes = mysqli_query($conn, "SELECT * FROM notes_aroma_custom ORDER BY kat
         .note-img-box { width: 100%; height: 220px; border-radius: 16px; background: var(--beige); overflow: hidden; margin-bottom: 20px; position: relative; }
         .note-img-box img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Badge Kategori Aroma */
         .badge-kategori { position: absolute; top: 15px; right: 15px; padding: 6px 14px; border-radius: 100px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; backdrop-filter: blur(8px); }
         .badge-top { background: rgba(200, 217, 230, 0.9); color: var(--navy); }
         .badge-middle { background: rgba(86, 124, 141, 0.9); color: var(--white); }
@@ -79,10 +72,8 @@ $queryNotes = mysqli_query($conn, "SELECT * FROM notes_aroma_custom ORDER BY kat
         .note-info h3 { font-size: 20px; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
         .note-info p { font-size: 14px; color: var(--teal); line-height: 1.6; font-weight: 500; margin-bottom: 15px; flex: 1; }
 
-        /* FOOTER */
         footer { background: var(--navy); color: var(--white); padding: 40px; text-align: center; font-weight: 600; font-size: 14px; border-radius: 40px 40px 0 0; }
         
-        /* Responsif untuk Layar Kecil */
         @media (max-width: 768px) {
             .page-header { flex-direction: column; align-items: flex-start; gap: 25px; margin-top: 120px; }
         }
@@ -101,7 +92,6 @@ $queryNotes = mysqli_query($conn, "SELECT * FROM notes_aroma_custom ORDER BY kat
             <a href="track_order.php">Track Order</a>
         </div>
         
-        <!-- LOGIKA NAVBAR DINAMIS -->
         <?php if(isset($_SESSION['pelanggan_id'])) : ?>
             <div class="nav-actions">
                 <button class="btn-cart" onclick="window.location.href='keranjang.php'" aria-label="Keranjang">
@@ -134,10 +124,8 @@ $queryNotes = mysqli_query($conn, "SELECT * FROM notes_aroma_custom ORDER BY kat
         <?php 
         if(mysqli_num_rows($queryNotes) > 0) {
             while($note = mysqli_fetch_assoc($queryNotes)) {
-                // Atur path gambar. Jika tabel tidak ada kolom foto atau foto kosong, pakaikan placeholder
                 $foto_path = (!empty($note['foto'])) ? '../' . $note['foto'] : '../assets/perscents_kotak.png';
                 
-                // Menentukan warna badge berdasarkan kategori (Top/Middle/Base)
                 $kategori = strtolower($note['kategori']);
                 $badge_class = 'badge-default';
                 if (strpos($kategori, 'top') !== false) $badge_class = 'badge-top';

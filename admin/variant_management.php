@@ -2,7 +2,6 @@
 require_once '../config/cek_akses.php';
 require_once '../config/koneksi.php';
 
-// KETAHANAN LOGIC
 $search_ketahanan = isset($_GET['cari_ketahanan']) ? mysqli_real_escape_string($conn, $_GET['cari_ketahanan']) : '';
 $where_ketahanan = "WHERE 1=1"; 
 if (!empty($search_ketahanan)) { $where_ketahanan .= " AND nama LIKE '%$search_ketahanan%'"; }
@@ -14,7 +13,6 @@ $queryCountKetahanan = mysqli_query($conn, "SELECT COUNT(id) as total FROM mst_k
 $total_halaman_ketahanan = ceil(mysqli_fetch_assoc($queryCountKetahanan)['total'] / $limit_ketahanan);
 $queryKetahanan = mysqli_query($conn, "SELECT * FROM mst_ketahanan $where_ketahanan ORDER BY id DESC LIMIT $limit_ketahanan OFFSET $offset_ketahanan");
 
-// UKURAN LOGIC
 $search_ukuran = isset($_GET['cari_ukuran']) ? mysqli_real_escape_string($conn, $_GET['cari_ukuran']) : '';
 $where_ukuran = "WHERE 1=1"; 
 if (!empty($search_ukuran)) { $where_ukuran .= " AND nama LIKE '%$search_ukuran%'"; }
@@ -29,7 +27,6 @@ $queryUkuran = mysqli_query($conn, "SELECT * FROM mst_ukuran $where_ukuran ORDER
 $params_ukuran_only = "&halaman_ukuran=$halaman_ukuran&cari_ukuran=" . urlencode($search_ukuran);
 $params_ketahanan_only = "&halaman_ketahanan=$halaman_ketahanan&cari_ketahanan=" . urlencode($search_ketahanan);
 
-// SIDEBAR SUMMARIES
 $querySemuaKetahanan = mysqli_query($conn, "SELECT nama, durasi FROM mst_ketahanan ORDER BY id ASC LIMIT 5");
 $querySemuaUkuran = mysqli_query($conn, "SELECT nama, ml FROM mst_ukuran ORDER BY ml ASC LIMIT 5");
 ?>
@@ -44,11 +41,9 @@ $querySemuaUkuran = mysqli_query($conn, "SELECT nama, ml FROM mst_ukuran ORDER B
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- GLOBAL MODERN UI --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: #F4F7FE; color: #2B3674; display: flex; font-size: 14px; }
         
-        /* --- SIDEBAR --- */
         .sidebar { width: 260px; background: #ffffff; height: 100vh; position: fixed; left: 0; top: 0; box-shadow: 4px 0 20px rgba(0,0,0,0.03); display: flex; flex-direction: column; padding: 24px 20px; z-index: 100; }
         .sidebar-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding: 0 10px; }
         .sidebar-logo img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #F4F7FE; padding: 4px; }
@@ -59,7 +54,6 @@ $querySemuaUkuran = mysqli_query($conn, "SELECT nama, ml FROM mst_ukuran ORDER B
         .sidebar-menu a:hover { background: #F4F7FE; color: #5A738E; }
         .sidebar-menu a.active { background: #5A738E; color: #ffffff; box-shadow: 0 4px 12px rgba(90, 115, 142, 0.3); }
 
-        /* --- MAIN CONTENT --- */
         .main-wrapper { margin-left: 260px; width: calc(100% - 260px); min-height: 100vh; padding: 30px 40px; display: flex; flex-direction: column; }
         
         .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
@@ -69,7 +63,6 @@ $querySemuaUkuran = mysqli_query($conn, "SELECT nama, ml FROM mst_ukuran ORDER B
         .admin-profile img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
         .admin-profile span { font-weight: 600; font-size: 14px; color: #2B3674; }
 
-        /* --- CARDS & GRIDS --- */
         .card { background: #ffffff; border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 24px; border: none; transition: transform 0.2s ease; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.04); }
         .card h3 { font-size: 15px; color: #A3AED0; font-weight: 500; margin-bottom: 12px; }
@@ -78,7 +71,6 @@ $querySemuaUkuran = mysqli_query($conn, "SELECT nama, ml FROM mst_ukuran ORDER B
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 24px; }
         .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px; }
 
-        /* --- TABLES --- */
         .table-responsive { width: 100%; overflow-x: auto; }
         .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
         .data-table th { color: #A3AED0; font-weight: 500; font-size: 13px; text-transform: uppercase; padding: 16px; border-bottom: 1px solid #E9EDF7; text-align: left; }
@@ -86,14 +78,12 @@ $querySemuaUkuran = mysqli_query($conn, "SELECT nama, ml FROM mst_ukuran ORDER B
         .data-table tr:last-child td { border-bottom: none; }
         .data-table tr:hover td { background: #F8FAFC; }
 
-        /* --- BADGES --- */
         .badge { padding: 6px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; text-transform: capitalize; }
         .badge-success { background: #E5F8ED; color: #05CD99; }
         .badge-warning { background: #FFF4E5; color: #FFB547; }
         .badge-danger { background: #FEECEE; color: #EE5D50; }
         .badge-blue { background: #E0F2FE; color: #0284C7; }
 
-        /* --- BUTTONS & INPUTS --- */
         .btn-primary { background: #5A738E; color: white; padding: 10px 20px; border-radius: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; transition: 0.3s; border: none; cursor: pointer; }
         .btn-primary:hover { background: #495e75; box-shadow: 0 4px 12px rgba(90, 115, 142, 0.3); transform: translateY(-2px); }
         
@@ -120,7 +110,6 @@ $querySemuaUkuran = mysqli_query($conn, "SELECT nama, ml FROM mst_ukuran ORDER B
 </head>
 <body>
 
-    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-logo">
             <img src="<?= $base_url; ?>/assets/Logo_Perscents.png" alt="Logo">
@@ -147,7 +136,6 @@ $querySemuaUkuran = mysqli_query($conn, "SELECT nama, ml FROM mst_ukuran ORDER B
             </div>
         </header>
 
-        <!-- TOP WIDGETS -->
         <div class="grid-3">
             <div class="card" style="padding: 20px;">
                 <h3 style="color:#05CD99; font-weight:600;"><i class="fa-solid fa-clock"></i> Ringkasan Ketahanan</h3>
@@ -184,7 +172,6 @@ $querySemuaUkuran = mysqli_query($conn, "SELECT nama, ml FROM mst_ukuran ORDER B
             </div>
         </div>
 
-        <!-- TABEL KETAHANAN -->
         <section class="card">
             <h2>Master Data: Ketahanan Aroma</h2>
             <form method="GET" action="variant_management.php">
@@ -247,7 +234,6 @@ $querySemuaUkuran = mysqli_query($conn, "SELECT nama, ml FROM mst_ukuran ORDER B
             <?php endif; ?>
         </section>
 
-        <!-- TABEL UKURAN -->
         <section class="card">
             <h2>Master Data: Ukuran Botol</h2>
             <form method="GET" action="variant_management.php">

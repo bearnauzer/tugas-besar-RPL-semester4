@@ -2,7 +2,6 @@
 session_start();
 require_once '../config/koneksi.php';
 
-// Ambil Data Master dari Database
 $queryNotes = mysqli_query($conn, "SELECT * FROM notes_aroma_custom ORDER BY nama ASC");
 $notes_data = [];
 while($row = mysqli_fetch_assoc($queryNotes)) $notes_data[] = $row;
@@ -15,7 +14,6 @@ $queryKetahanan = mysqli_query($conn, "SELECT * FROM mst_ketahanan ORDER BY tamb
 $ketahanan_data = [];
 while($row = mysqli_fetch_assoc($queryKetahanan)) $ketahanan_data[] = $row;
 
-// LOGIKA ADD TO CART CUSTOM
 if(isset($_POST['add_custom_cart'])) {
     if(!isset($_SESSION['pelanggan_id'])) {
         echo "<script>alert('Silakan login terlebih dahulu!'); window.location.href='login_pelanggan.php';</script>";
@@ -27,10 +25,8 @@ if(isset($_POST['add_custom_cart'])) {
     $id_ukuran = (int)$_POST['id_ukuran'];
     $id_ketahanan = (int)$_POST['id_ketahanan'];
     
-    // Notes sekarang diambil dari hidden input yang di-generate JavaScript
     $selected_notes = isset($_POST['notes']) ? $_POST['notes'] : [];
 
-    // Validasi backend
     if(count($selected_notes) < 1 || count($selected_notes) > 3 || !$id_ukuran || !$id_ketahanan || empty($nama_custom)) {
         echo "<script>alert('Harap lengkapi semua pilihan (Nama, 1-3 Notes, Ukuran, Ketahanan).');</script>";
     } else {
@@ -101,12 +97,10 @@ if(isset($_POST['add_custom_cart'])) {
         .input-text { width: 100%; padding: 18px 20px; border: 1.5px solid var(--sky-blue); border-radius: 16px; font-family: inherit; font-size: 15px; color: var(--navy); background: var(--white); transition: 0.3s; }
         .input-text:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 4px rgba(200, 217, 230, 0.4); }
 
-        /* FILTER KATEGORI TABS */
         .filter-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
         .filter-btn { padding: 8px 20px; background: var(--white); border: 1px solid var(--sky-blue); color: var(--teal); border-radius: 100px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; white-space: nowrap; }
         .filter-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
 
-        /* GRID OPTIONS & PAGINATION */
         .grid-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; min-height: 380px; align-content: start; }
         .pagination-container { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
         .page-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--sky-blue); background: var(--white); color: var(--teal); font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
@@ -129,7 +123,6 @@ if(isset($_POST['add_custom_cart'])) {
         .opt-sub { font-size: 12px; color: var(--teal); font-weight: 500; line-height: 1.5; flex: 1; }
         .opt-price { font-size: 12px; font-weight: 800; color: var(--teal); margin-top: 10px; }
 
-        /* KANAN: SUMMARY SECTION */
         .summary-section { flex: 1; position: sticky; top: 40px; background: var(--navy); color: var(--white); padding: 35px; border-radius: 32px; box-shadow: 0 20px 40px rgba(47, 65, 86, 0.15); }
         .sum-title { font-size: 20px; font-weight: 800; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
         
@@ -163,13 +156,11 @@ if(isset($_POST['add_custom_cart'])) {
     </a>
 
     <div class="container">
-        <!-- KIRI: FORM -->
         <div class="form-section">
             <h1 class="form-title">Custom Lab</h1>
             <p class="form-subtitle">Jadilah peracik. Jelajahi koleksi notes kami dan gabungkan hingga 3 aroma untuk menciptakan *signature scent* milikmu sendiri.</p>
 
             <form action="" method="POST" id="customForm">
-                <!-- WADAH RAHASIA UNTUK MENYIMPAN NOTES PILIHAN -->
                 <div id="hiddenNotesContainer"></div>
                 
                 <div class="form-group">
@@ -177,14 +168,12 @@ if(isset($_POST['add_custom_cart'])) {
                     <input type="text" name="nama_custom" id="namaCustom" class="input-text" placeholder="Contoh: Midnight Elegance" required>
                 </div>
 
-                <!-- BAGIAN NOTES DENGAN FILTER & PAGINATION -->
                 <div class="form-group">
                     <div class="section-header">
                         <div class="section-label">Pilih Notes Aroma</div>
                         <div class="section-note" id="notesCounter">0 / 3 Dipilih</div>
                     </div>
                     
-                    <!-- Filter Tabs -->
                     <div class="filter-tabs">
                         <button type="button" class="filter-btn active" onclick="setCategory('semua')">Semua Aroma</button>
                         <button type="button" class="filter-btn" onclick="setCategory('pria')">Pria</button>
@@ -192,14 +181,11 @@ if(isset($_POST['add_custom_cart'])) {
                         <button type="button" class="filter-btn" onclick="setCategory('unisex')">Unisex</button>
                     </div>
 
-                    <!-- Tempat Notes Muncul -->
                     <div class="grid-options" id="notesGrid"></div>
 
-                    <!-- Pagination Angka -->
                     <div class="pagination-container" id="paginationContainer"></div>
                 </div>
 
-                <!-- PILIH UKURAN -->
                 <div class="form-group">
                     <div class="section-label" style="margin-bottom: 15px;">Pilih Ukuran Botol</div>
                     <div class="grid-options" style="min-height: auto; margin-bottom: 0;">
@@ -216,7 +202,6 @@ if(isset($_POST['add_custom_cart'])) {
                     </div>
                 </div>
 
-                <!-- PILIH KETAHANAN -->
                 <div class="form-group">
                     <div class="section-label" style="margin-bottom: 15px;">Pilih Tingkat Ketahanan</div>
                     <div class="grid-options" style="grid-template-columns: 1fr; min-height: auto; margin-bottom: 0;">
@@ -239,7 +224,6 @@ if(isset($_POST['add_custom_cart'])) {
             </form>
         </div>
 
-        <!-- KANAN: SUMMARY -->
         <div class="summary-section">
             <div class="sum-title">Rincian Custom</div>
             
@@ -268,49 +252,38 @@ if(isset($_POST['add_custom_cart'])) {
         </div>
     </div>
 
-    <!-- JAVASCRIPT MAGIC: FILTERING & PAGINATION -->
     <script>
-        // 1. Ambil data mentah dari PHP ke JS
         const allNotes = <?= json_encode($notes_data); ?>;
         
-        // 2. Variabel State (Ingatan Sistem)
-        let selectedNotes = []; // Menyimpan ID notes yang di-klik walau beda halaman
+        let selectedNotes = []; 
         let currentCategory = 'semua';
         let currentPage = 1;
         const limitPerPage = 9;
 
-        // Element DOM
         const notesGrid = document.getElementById('notesGrid');
         const paginationContainer = document.getElementById('paginationContainer');
         const counterText = document.getElementById('notesCounter');
         const hiddenNotesContainer = document.getElementById('hiddenNotesContainer');
         const mainSubmitBtn = document.getElementById('mainSubmitBtn');
 
-        // FUNGSI RENDER (Menampilkan Data)
         function renderNotes() {
-            // Filter kategori dulu
             let filtered = allNotes;
             if(currentCategory !== 'semua') {
                 filtered = allNotes.filter(n => n.kategori && n.kategori.toLowerCase() === currentCategory);
             }
 
-            // Hitung total halaman
             const totalPages = Math.ceil(filtered.length / limitPerPage) || 1;
             if(currentPage > totalPages) currentPage = totalPages;
 
-            // Potong data sesuai halaman saat ini (0-8, 9-17, dst)
             const startIndex = (currentPage - 1) * limitPerPage;
             const notesToShow = filtered.slice(startIndex, startIndex + limitPerPage);
 
-            // Bersihkan area
             notesGrid.innerHTML = '';
             
-            // Render HTML tiap kartu notes
             notesToShow.forEach(note => {
                 const isChecked = selectedNotes.includes(note.id);
                 const isMaxedOut = selectedNotes.length >= 3 && !isChecked;
                 
-                // Set warna badge sesuai kategori
                 let badgeClass = 'badge-unisex';
                 if(note.kategori.toLowerCase() === 'pria') badgeClass = 'badge-pria';
                 if(note.kategori.toLowerCase() === 'wanita') badgeClass = 'badge-wanita';
@@ -335,7 +308,6 @@ if(isset($_POST['add_custom_cart'])) {
             checkCheckoutStatus();
         }
 
-        // FUNGSI KLIK NOTES (Tambah/Hapus dari memori)
         function toggleNote(checkbox, noteId) {
             if(checkbox.checked) {
                 if(selectedNotes.length < 3) selectedNotes.push(noteId);
@@ -343,26 +315,22 @@ if(isset($_POST['add_custom_cart'])) {
                 selectedNotes = selectedNotes.filter(id => id !== noteId);
             }
             
-            // Render ulang biar yang lain otomatis disabled kalau udah 3
             renderNotes(); 
         }
 
-        // FUNGSI GANTI KATEGORI (Filter Tab)
         function setCategory(cat) {
             currentCategory = cat;
-            currentPage = 1; // Balik ke halaman 1 tiap ganti tab
+            currentPage = 1; 
             
-            // Ganti warna tombol tab
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
             renderNotes();
         }
 
-        // FUNGSI PAGINATION BUTTONS
         function renderPagination(totalPages) {
             paginationContainer.innerHTML = '';
-            if(totalPages <= 1) return; // Kalau cuma 1 halaman, tombolnya hilangin aja
+            if(totalPages <= 1) return; 
 
             for(let i = 1; i <= totalPages; i++) {
                 paginationContainer.innerHTML += `
@@ -372,7 +340,6 @@ if(isset($_POST['add_custom_cart'])) {
             }
         }
 
-        // MENYIMPAN DATA KE HIDDEN INPUT (Agar bisa dibaca PHP pas di-submit)
         function updateHiddenInputs() {
             hiddenNotesContainer.innerHTML = '';
             selectedNotes.forEach(id => {
@@ -381,9 +348,6 @@ if(isset($_POST['add_custom_cart'])) {
             counterText.innerText = `${selectedNotes.length} / 3 Dipilih`;
         }
 
-        // ==========================================
-        // KALKULASI HARGA & VALIDASI TOMBOL
-        // ==========================================
         const formatRp = (angka) => new Intl.NumberFormat('id-ID').format(angka);
 
         function calculateTotal() {
@@ -407,12 +371,10 @@ if(isset($_POST['add_custom_cart'])) {
                 total += hargaKet;
             }
 
-            // Update Teks Harga
             document.getElementById('displayHargaUkuran').innerText = 'Rp ' + formatRp(hargaUk);
             document.getElementById('displayHargaKetahanan').innerText = 'Rp ' + formatRp(hargaKet);
             document.getElementById('displayTotal').innerText = 'Rp ' + formatRp(total);
 
-            // Cek apakah semua syarat komplit (Nama terisi + Minimal 1 Note + Ukuran + Ketahanan)
             const namaInput = document.getElementById('namaCustom').value.trim();
             if(selectedNotes.length > 0 && selectedUkuran && selectedKetahanan && namaInput !== '') {
                 mainSubmitBtn.disabled = false;
@@ -423,10 +385,8 @@ if(isset($_POST['add_custom_cart'])) {
             }
         }
 
-        // Event listener saat mengetik nama parfum
         document.getElementById('namaCustom').addEventListener('input', checkCheckoutStatus);
 
-        // Render halaman pertama kali dibuka
         window.onload = renderNotes;
     </script>
 </body>

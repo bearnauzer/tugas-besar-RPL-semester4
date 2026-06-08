@@ -2,7 +2,6 @@
 session_start();
 require_once '../config/koneksi.php';
 
-// Jika sudah login, tendang balik ke halaman utama
 if(isset($_SESSION['pelanggan_id'])) {
     header("Location: index.php");
     exit;
@@ -11,70 +10,52 @@ if(isset($_SESSION['pelanggan_id'])) {
 $pesan_error = '';
 $pesan_sukses = '';
 
-// ==========================================
-// LOGIKA REGISTER
-// ==========================================
 if(isset($_POST['register'])) {
-    // Trim untuk menghapus spasi kosong di awal/akhir input
     $nama = trim(mysqli_real_escape_string($conn, $_POST['nama_lengkap']));
     $email = strtolower(trim(mysqli_real_escape_string($conn, $_POST['email'])));
     $no_hp = trim(mysqli_real_escape_string($conn, $_POST['no_hp']));
     $password_raw = $_POST['password']; 
 
-    // VALIDASI KETAT SESUAI TEST CASE:
 
-    // 4, 7, 9. Pengecekan input tidak boleh kosong (walau spasi doang)
     if (empty($nama) || empty($email) || empty($password_raw) || empty($no_hp)) {
         $pesan_error = "Pendaftaran gagal! Semua kolom wajib diisi.";
     } 
-    // 1. Nama minimal karakter (misal 3 karakter) -> Pakai mb_strlen untuk dukung karakter asing
     elseif (mb_strlen($nama) < 3) {
         $pesan_error = "Pendaftaran gagal! Nama lengkap minimal 3 karakter.";
     }
-    // 3. Nama maksimal karakter (mencegah overflow database)
     elseif (mb_strlen($nama) > 50) {
         $pesan_error = "Pendaftaran gagal! Nama lengkap maksimal 50 karakter.";
     }
-    // 5. Nama hanya boleh huruf dan spasi (mendukung Arab, Korea, Kanji, dll pakai \p{L})
     elseif (!preg_match('/^[\p{L}\p{M}\s]+$/u', $nama)) {
         $pesan_error = "Pendaftaran gagal! Nama hanya boleh berisi huruf dan spasi (angka dan simbol tidak diizinkan).";
     }
-    // 8. Email format valid & wajib @gmail.com
     elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || !preg_match('/@gmail\.com$/', $email)) {
         $pesan_error = "Pendaftaran gagal! Format email tidak valid atau tidak menggunakan domain @gmail.com.";
     }
-    // 10. Password kurang dari 6 karakter
     elseif (strlen($password_raw) < 6) {
         $pesan_error = "Pendaftaran gagal! Password minimal 6 karakter.";
     }
-    // 11. Password harus ada angka (Alfanumerik)
     elseif (!preg_match('/[0-9]/', $password_raw)) {
         $pesan_error = "Pendaftaran gagal! Password harus mengandung setidaknya satu angka.";
     }
-    // 11. Password harus ada huruf (Alfanumerik)
     elseif (!preg_match('/[A-Za-z]/', $password_raw)) {
         $pesan_error = "Pendaftaran gagal! Password harus mengandung setidaknya satu huruf.";
     }
-    // 12. Password harus ada huruf kapital
     elseif (!preg_match('/[A-Z]/', $password_raw)) {
         $pesan_error = "Pendaftaran gagal! Password harus mengandung setidaknya satu huruf kapital.";
     }
-    // 13. Password harus ada karakter khusus
     elseif (!preg_match('/[\W_]/', $password_raw)) {
         $pesan_error = "Pendaftaran gagal! Password harus mengandung setidaknya satu karakter khusus (contoh: !@#$%^&*).";
     } 
     else {
-        // 6. Cek apakah email sudah dipakai di database
         $cek_email = mysqli_query($conn, "SELECT email FROM pelanggan WHERE email = '$email'");
         if(mysqli_num_rows($cek_email) > 0) {
             $pesan_error = "Email sudah terdaftar! Silakan gunakan email lain atau langsung Login.";
         } else {
-            // Semua validasi lolos, hash password dan masukkan ke DB
             $password_hashed = password_hash($password_raw, PASSWORD_DEFAULT);
             $insert = mysqli_query($conn, "INSERT INTO pelanggan (nama_lengkap, email, password, no_hp) VALUES ('$nama', '$email', '$password_hashed', '$no_hp')");
             
             if($insert) {
-                // Pastikan juga ada entri pengguna di tabel users supaya order dapat disimpan dengan foreign key valid
                 $existingUser = mysqli_query($conn, "SELECT id FROM users WHERE email = '$email'");
                 if(mysqli_num_rows($existingUser) == 0) {
                     mysqli_query($conn, "INSERT INTO users (nama, email, password, no_hp, role) VALUES ('$nama', '$email', '$password_hashed', '$no_hp', 'customer')");
@@ -87,9 +68,6 @@ if(isset($_POST['register'])) {
     }
 }
 
-// ==========================================
-// LOGIKA LOGIN
-// ==========================================
 if(isset($_POST['login'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
@@ -135,7 +113,6 @@ if(isset($_POST['login'])) {
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* PALET WARNA SIGNATURE */
         :root {
             --navy: #2F4156;
             --teal: #567C8D;
@@ -151,16 +128,12 @@ if(isset($_POST['login'])) {
         a { text-decoration: none; color: var(--teal); font-weight: 700; transition: 0.3s; cursor: pointer; }
         a:hover { color: var(--navy); }
 
-        /* Blob Backgrounds */
         .blob { position: absolute; border-radius: 50%; filter: blur(60px); z-index: -1; opacity: 0.6; }
         .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: var(--sky-blue); }
         .blob-2 { bottom: -10%; right: -5%; width: 400px; height: 400px; background: var(--teal); }
 
-        /* MAIN CONTAINER GLASSMORPHISM */
-        /* TINGGI DIPERBESAR MENJADI 680px AGAR KONTEN TIDAK TUMPAH */
         .auth-container { width: 900px; max-width: 95%; height: 680px; background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 40px; box-shadow: 0 20px 50px rgba(47, 65, 86, 0.1); display: flex; overflow: hidden; position: relative; }
 
-        /* VISUAL PANEL (Bagian Kiri/Brand Info) */
         .visual-panel { 
             flex: 1; 
             background: linear-gradient(to bottom, rgba(47, 65, 86, 0.3), rgba(47, 65, 86, 0.95)), url('../assets/dokumentasi/iklan1.jpg');
@@ -182,10 +155,8 @@ if(isset($_POST['login'])) {
         
         .deco-circle { position: absolute; bottom: -50px; right: -50px; width: 200px; height: 200px; border-radius: 50%; background: var(--teal); opacity: 0.5; filter: blur(20px); }
 
-        /* FORM PANEL (Area Input) */
         .form-panel { flex: 1; position: relative; }
         
-        /* PADDING ATAS-BAWAH DIKURANGI SEDIKIT AGAR LEBIH LEGA */
         .form-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 40px 50px; display: flex; flex-direction: column; justify-content: center; transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         
         .form-login { transform: translateX(0); opacity: 1; pointer-events: auto; }
@@ -197,7 +168,6 @@ if(isset($_POST['login'])) {
         .form-wrapper h3 { font-size: 28px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
         .form-wrapper > p { font-size: 14px; color: var(--teal); margin-bottom: 20px; font-weight: 500; }
         
-        /* MARGIN INPUT DIKURANGI AGAR TIDAK TERLALU RENGGANG */
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         .input-group input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--sky-blue); background: var(--white); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--navy); transition: 0.3s; outline: none; }

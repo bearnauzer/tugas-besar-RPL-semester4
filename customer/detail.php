@@ -10,10 +10,8 @@ if(isset($_SESSION['flash_message'])) {
     unset($_SESSION['flash_message'], $_SESSION['flash_type']);
 }
 
-// Ambil ID Produk dari URL
 $id_produk = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Ambil data produk utama (Pakai kolom 'gambar' sesuai database kamu)
 $queryProduk = mysqli_query($conn, "SELECT * FROM produk_collection WHERE id = $id_produk");
 if(mysqli_num_rows($queryProduk) == 0) {
     echo "<script>alert('Produk tidak ditemukan!'); window.location.href='index.php';</script>";
@@ -21,9 +19,6 @@ if(mysqli_num_rows($queryProduk) == 0) {
 }
 $produk = mysqli_fetch_assoc($queryProduk);
 
-// ===================================================================================
-// INI QUERY YANG SUDAH DIPERBAIKI 100% SESUAI DATABASE KAMU
-// ===================================================================================
 $queryVarian = mysqli_query($conn, "
     SELECT 
         pv.id AS id_varian, 
@@ -45,23 +40,19 @@ $sizes = [];
 $durations = [];
 
 while($row = mysqli_fetch_assoc($queryVarian)) {
-    // Simpan semua varian ke array untuk dipakai di JavaScript
     $varians[] = $row;
     
-    // Kumpulkan opsi Size yang unik (pakai nama_ukuran)
     $sizes[$row['id_ukuran']] = [
         'nama' => $row['nama_ukuran'],
         'ml' => $row['ml']
     ];
     
-    // Kumpulkan opsi Duration yang unik (pakai nama_ketahanan)
     $durations[$row['id_ketahanan']] = [
         'nama' => $row['nama_ketahanan'],
         'durasi' => $row['durasi']
     ];
 }
 
-// LOGIKA ADD TO CART
 if(isset($_POST['add_to_cart'])) {
     if(!isset($_SESSION['pelanggan_id'])) {
         echo "<script>alert('Silakan login terlebih dahulu untuk menambahkan ke keranjang.'); window.location.href='login_pelanggan.php';</script>";
@@ -81,7 +72,6 @@ if(isset($_POST['add_to_cart'])) {
         if($insertCart) {
             $_SESSION['flash_message'] = 'Berhasil ditambahkan ke keranjang!';
             $_SESSION['flash_type'] = 'success';
-            // UBAH DI SINI: Langsung redirect ke halaman keranjang
             header('Location: keranjang.php');
             exit;
         } else {
@@ -179,7 +169,6 @@ if(isset($_POST['add_to_cart'])) {
         <div class="detail-container">
             <div class="img-section">
                 <?php 
-                // Kita cek kolom 'foto' atau 'gambar' biar nggak meleset lagi!
                 $kolom_foto = !empty($produk['foto']) ? $produk['foto'] : (!empty($produk['gambar']) ? $produk['gambar'] : '');
                 $foto_path = (!empty($kolom_foto)) ? '../' . $kolom_foto : '../assets/perscents_kotak.png'; 
                 ?>

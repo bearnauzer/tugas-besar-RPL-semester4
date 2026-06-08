@@ -238,7 +238,6 @@ if (isset($_POST['login'])) {
             background-color: #4A5B6C;
         }
 
-        /* Notifikasi Error */
         .error-message {
             background-color: #fadbd8;
             color: #e74c3c;

@@ -2,7 +2,6 @@
 require_once '../config/cek_akses.php';
 require_once '../config/koneksi.php';
 
-// Ambil semua data Master untuk ditampilkan di Panduan
 $qProduk = mysqli_query($conn, "SELECT * FROM produk_collection ORDER BY tipe, nama ASC");
 $qNotes = mysqli_query($conn, "SELECT * FROM notes_aroma_custom ORDER BY nama ASC");
 $qUkuran = mysqli_query($conn, "SELECT * FROM mst_ukuran ORDER BY ml ASC");
@@ -20,7 +19,6 @@ $qKetahanan = mysqli_query($conn, "SELECT * FROM mst_ketahanan ORDER BY id ASC")
         body { background-color: #f4f6f9; color: #333; }
         .app-layout { display: flex; min-height: 100vh; }
 
-        /* SIDEBAR (Konsisten) */
         .sidebar { width: 260px; background-color: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 25px 20px; position: sticky; top: 0; height: 100vh; }
         .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding-left: 5px; }
         .brand-logo { width: 40px; height: 40px; background-color: #5A738E; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -34,13 +32,11 @@ $qKetahanan = mysqli_query($conn, "SELECT * FROM mst_ketahanan ORDER BY id ASC")
         .sidebar-nav a.active svg { stroke: white; }
         .sidebar-nav .logout { margin-top: auto; color: #ef4444; }
 
-        /* KONTEN UTAMA */
         .main-content { flex: 1; padding: 40px; overflow-y: auto; }
         .page-header { margin-bottom: 30px; }
         .page-header h2 { font-size: 28px; color: #1e293b; font-weight: 800; margin-bottom: 5px; }
         .page-header p { color: #64748b; font-size: 15px; }
 
-        /* TABS NAVIGATION */
         .tabs { display: flex; gap: 10px; border-bottom: 2px solid #e2e8f0; margin-bottom: 30px; }
         .tab-btn { background: none; border: none; padding: 12px 24px; font-size: 15px; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: 0.2s; }
         .tab-btn:hover { color: #5A738E; }
@@ -50,7 +46,6 @@ $qKetahanan = mysqli_query($conn, "SELECT * FROM mst_ketahanan ORDER BY id ASC")
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* KARTU SOP */
         .sop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
         .sop-card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
         .sop-card h3 { font-size: 20px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1; display: flex; align-items: center; gap: 10px; }
@@ -62,7 +57,6 @@ $qKetahanan = mysqli_query($conn, "SELECT * FROM mst_ketahanan ORDER BY id ASC")
         .step-text h4 { font-size: 15px; color: #1e293b; margin-bottom: 4px; }
         .step-text p { font-size: 13.5px; color: #64748b; line-height: 1.5; }
 
-        /* GRID KATALOG & NOTES */
         .katalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
         .katalog-card { background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
         .katalog-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.05); border-color: #cbd5e1; }
@@ -74,7 +68,6 @@ $qKetahanan = mysqli_query($conn, "SELECT * FROM mst_ketahanan ORDER BY id ASC")
         .badge-purple { background: #f3e8ff; color: #7e22ce; }
         .badge-gray { background: #f1f5f9; color: #475569; }
 
-        /* TABEL TAKARAN */
         .tabel-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; margin-bottom: 30px; }
         .tabel-box h3 { padding: 20px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-size: 16px; color: #1e293b; }
         table { width: 100%; border-collapse: collapse; }
@@ -83,7 +76,6 @@ $qKetahanan = mysqli_query($conn, "SELECT * FROM mst_ketahanan ORDER BY id ASC")
         td { font-size: 14px; color: #333; }
         tr:last-child td { border-bottom: none; }
 
-        /* MODAL POPUP */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9999; }
         .modal-overlay.active { display: flex; }
         .modal-card { background: white; width: 100%; max-width: 500px; border-radius: 12px; overflow: hidden; transform: scale(0.95); transition: 0.2s; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
@@ -256,10 +248,9 @@ $qKetahanan = mysqli_query($conn, "SELECT * FROM mst_ketahanan ORDER BY id ASC")
             <div id="tab-katalog" class="tab-content">
                 <div class="katalog-grid">
                     <?php 
-                    mysqli_data_seek($qProduk, 0); // Reset pointer
+                    mysqli_data_seek($qProduk, 0); 
                     while($prod = mysqli_fetch_assoc($qProduk)){ 
                         $foto = !empty($prod['foto']) ? $prod['foto'] : 'assets/Logo_Perscents.png';
-                        // Escaping data untuk JavaScript
                         $n = htmlspecialchars($prod['nama'], ENT_QUOTES);
                         $d = htmlspecialchars($prod['deskripsi'], ENT_QUOTES);
                         $k = htmlspecialchars($prod['kategori'], ENT_QUOTES);
@@ -276,7 +267,7 @@ $qKetahanan = mysqli_query($conn, "SELECT * FROM mst_ketahanan ORDER BY id ASC")
             <div id="tab-notes" class="tab-content">
                 <div class="katalog-grid">
                     <?php 
-                    mysqli_data_seek($qNotes, 0); // Reset pointer
+                    mysqli_data_seek($qNotes, 0); 
                     while($note = mysqli_fetch_assoc($qNotes)){ 
                         $n = htmlspecialchars($note['nama'], ENT_QUOTES);
                         $d = htmlspecialchars($note['deskripsi'], ENT_QUOTES);
@@ -315,49 +306,40 @@ $qKetahanan = mysqli_query($conn, "SELECT * FROM mst_ketahanan ORDER BY id ASC")
     </div>
 
     <script>
-        // Logika Untuk Pindah Tab Menu
         function openTab(evt, tabId) {
-            // Sembunyikan semua tab content
             var contents = document.getElementsByClassName("tab-content");
             for (var i = 0; i < contents.length; i++) {
                 contents[i].classList.remove("active");
             }
             
-            // Hapus class active dari semua tombol
             var btns = document.getElementsByClassName("tab-btn");
             for (var i = 0; i < btns.length; i++) {
                 btns[i].classList.remove("active");
             }
             
-            // Tampilkan tab yang diklik dan aktifkan tombolnya
             document.getElementById(tabId).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
 
-        // Logika Untuk Buka Modal Pop-up (Menyuntikkan Data)
         function bukaModal(imgSrc, nama, kategori, tipe, deskripsi) {
             document.getElementById("mImg").src = imgSrc;
             document.getElementById("mTitle").innerText = nama;
             document.getElementById("mKategori").innerText = "Gender: " + kategori.toUpperCase();
             document.getElementById("mTipe").innerText = tipe;
             
-            // Jika deskripsi kosong di database
             if(deskripsi.trim() === '') {
                 document.getElementById("mDesc").innerText = "Tidak ada deskripsi karakter/catatan tambahan untuk item ini.";
             } else {
                 document.getElementById("mDesc").innerText = deskripsi;
             }
             
-            // Tampilkan Overlay Modal
             document.getElementById("modalDetail").classList.add("active");
         }
 
-        // Logika Untuk Tutup Modal Pop-up
         function tutupModal() {
             document.getElementById("modalDetail").classList.remove("active");
         }
 
-        // Fitur klik area luar modal untuk menutup
         window.onclick = function(event) {
             var modal = document.getElementById("modalDetail");
             if (event.target == modal) {
